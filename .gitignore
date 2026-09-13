@@ -1,0 +1,76 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+!**/.env.example
+!**/.env.*.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+*.egg-info/
+
+# Node.js and frontend builds
+node_modules/
+.next/
+.nuxt/
+.svelte-kit/
+.vite/
+.turbo/
+dist/
+build/
+out/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime and temporary files
+*.log
+*.pid
+*.tmp
+tmp/
+temp/
+.cache/
+
+# Local data and generated evaluation output
+data/local/
+evals/reports/generated/
+notebooks/.ipynb_checkpoints/
+
+# Terraform local state and variable values
+infra/**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!*.tfvars.json.example
+crash.log
+crash.*.log
+
+# IDE and operating-system files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+Desktop.ini
