@@ -6,10 +6,10 @@ Tài liệu này quy định cách cấu hình, phát hành, giám sát và xử
 
 Các thiết kế chức năng và dữ liệu được mô tả tại:
 
-- [Kiến trúc hệ thống](../architecture/README.md)
-- [Yêu cầu sản phẩm](../product/README.md)
-- [Thiết kế dữ liệu](../data/README.md)
-- [Quyết định kiến trúc](../decisions/README.md)
+- [Kiến trúc hệ thống](../architecture/system-architecture.md)
+- [Yêu cầu sản phẩm](../product/product-requirements.md)
+- [Thiết kế dữ liệu](../data/data-design-governance.md)
+- [Quyết định kiến trúc](../decisions/architecture-decision-records.md)
 
 ## 2. Danh mục dịch vụ
 

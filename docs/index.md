@@ -6,12 +6,13 @@ Thư mục `docs/` chứa các tài liệu dùng để thiết kế, phát tri�
 
 | Tài liệu | Mục đích | Trạng thái |
 |---|---|---|
-| [Yêu cầu sản phẩm](product/README.md) | Người dùng, bài toán, phạm vi, yêu cầu chức năng và tiêu chí thành công | Draft |
-| [Kiến trúc hệ thống](architecture/README.md) | Ranh giới hệ thống, thành phần, luồng xử lý, contract và quality attributes | Draft |
-| [Thiết kế dữ liệu](data/README.md) | Grain, mô hình dữ liệu, metric, join, quality và governance | Draft |
-| [Quyết định kiến trúc](decisions/README.md) | Decision log, quy trình và mẫu ADR | Draft |
-| [Sổ tay vận hành](operations/README.md) | Release, guardrail, observability, incident và production readiness | Draft |
-| [Lộ trình phát triển](roadmap/README.md) | Giai đoạn thực hiện, sản phẩm bàn giao và cổng nghiệm thu | Draft |
+| [Yêu cầu sản phẩm](product/product-requirements.md) | Người dùng, bài toán, phạm vi, yêu cầu chức năng và tiêu chí thành công | Draft |
+| [Kiến trúc hệ thống](architecture/system-architecture.md) | Ranh giới hệ thống, thành phần, luồng xử lý, contract và quality attributes | Draft |
+| [Thiết kế dữ liệu](data/data-design-governance.md) | Grain, mô hình dữ liệu, metric, join, quality và governance | Draft |
+| [Quyết định kiến trúc](decisions/architecture-decision-records.md) | Decision log, quy trình và mẫu ADR | Draft |
+| [Sổ tay vận hành](operations/operations-runbook.md) | Release, guardrail, observability, incident và production readiness | Draft |
+| [Lộ trình phát triển](roadmap/product-roadmap.md) | Giai đoạn thực hiện, sản phẩm bàn giao và cổng nghiệm thu | Draft |
+| [Research map Text-to-SQL](research/text_to_sql_research_map.md) | Đối chiếu công trình nền tảng, kỹ thuật khả thi và hướng nghiên cứu tương lai | Draft |
 
 ## Phạm vi trách nhiệm
 
@@ -19,12 +20,13 @@ Khi nội dung xuất hiện ở nhiều tài liệu, nguồn chính được x�
 
 | Chủ đề | Nguồn chính |
 |---|---|
-| Persona, use case, MVP và yêu cầu UX | `product/README.md` |
-| Component, dependency, workflow và contract | `architecture/README.md` |
-| Table, grain, metric, dimension, join và data policy | `data/README.md` |
+| Persona, use case, MVP và yêu cầu UX | `product/product-requirements.md` |
+| Component, dependency, workflow và contract | `architecture/system-architecture.md` |
+| Table, grain, metric, dimension, join và data policy | `data/data-design-governance.md` |
 | Lý do chọn một phương án kỹ thuật | ADR trong `decisions/` |
-| Cấu hình runtime, release, SLO và incident | `operations/README.md` |
-| Thứ tự triển khai và exit criteria | `roadmap/README.md` |
+| Cấu hình runtime, release, SLO và incident | `operations/operations-runbook.md` |
+| Thứ tự triển khai và exit criteria | `roadmap/product-roadmap.md` |
+| Nền tảng nghiên cứu và kỹ thuật tham khảo | `research/text_to_sql_research_map.md` |
 
 Tài liệu khác chỉ nên dẫn liên kết hoặc tóm tắt phần cần thiết. Nếu có xung đột, owner của nguồn chính phải điều phối review và cập nhật các tài liệu phụ thuộc.
 

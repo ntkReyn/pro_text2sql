@@ -82,6 +82,8 @@ final answer + audit record
 
 Không cần triển khai toàn bộ agent ngay từ đầu. Với các luồng đã biết trước, workflow cố định dễ kiểm thử hơn; chỉ thêm agent ở nơi cần quyết định động, ví dụ chọn metric, phát hiện thiếu thông tin hoặc sửa lỗi SQL.
 
+Phạm vi hiện tại dùng pretrained LLM qua prompting, retrieval và structured output. Training, fine-tuning và reinforcement learning được để ở future work sau khi có baseline, failure taxonomy và evaluation gate đáng tin cậy.
+
 ## Quy ước ban đầu
 
 - Tên thư mục và module dùng `snake_case`; tên sản phẩm/API có thể dùng quy ước riêng của framework.
@@ -94,3 +96,5 @@ Không cần triển khai toàn bộ agent ngay từ đầu. Với các luồng 
 ## Trạng thái hiện tại
 
 Repository đang ở giai đoạn scaffold. Các file `.gitkeep` chỉ giữ chỗ cho những thư mục chưa có mã nguồn; khi thư mục có nội dung thật, có thể xóa file đó.
+
+Điểm bắt đầu của bộ tài liệu dự án: [docs/index.md](docs/index.md).

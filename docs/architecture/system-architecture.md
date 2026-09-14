@@ -4,6 +4,8 @@
 
 Tài liệu mô tả kiến trúc của hệ thống Semantic Text-to-SQL cho dữ liệu chuỗi cung ứng và tồn kho. Hệ thống tiếp nhận câu hỏi bằng ngôn ngữ tự nhiên, chuyển câu hỏi thành kế hoạch truy vấn có ngữ nghĩa, sinh và kiểm tra SQL, thực thi với quyền chỉ đọc, sau đó trả kết quả cùng bằng chứng truy vết.
 
+Vertical slice đầu tiên là supplier delivery performance; inventory status là lát cắt mở rộng kế tiếp. Kiến trúc vẫn giữ ranh giới module tổng quát nhưng không giả định phải hỗ trợ nhiều domain trong MVP.
+
 Tài liệu này xác định ranh giới hệ thống, trách nhiệm của các thành phần, hợp đồng trao đổi dữ liệu và các thuộc tính chất lượng cần được bảo vệ trong quá trình phát triển.
 
 ## 2. Mục tiêu kiến trúc
@@ -35,7 +37,8 @@ Tài liệu này xác định ranh giới hệ thống, trách nhiệm của cá
 - Tự động định nghĩa KPI không có phê duyệt;
 - Suy luận quan hệ nhân quả từ dữ liệu mô tả;
 - Truy vấn tự do trên toàn bộ data warehouse;
-- Forecasting hoặc prescriptive analytics chưa có model và evaluation riêng.
+- Forecasting hoặc prescriptive analytics chưa có model và evaluation riêng;
+- Huấn luyện foundation model, fine-tuning hoặc reinforcement learning trong phạm vi triển khai hiện tại.
 
 ## 4. Nguyên tắc thiết kế
 
@@ -46,6 +49,10 @@ LLM không nhận toàn bộ schema thô và không tự tạo công thức KPI.
 ### Deterministic controls
 
 LLM được dùng cho các tác vụ cần hiểu hoặc sinh ngôn ngữ. Authorization, SQL policy, resource limit, metric formula và result checks được thực hiện bằng code hoặc database policy.
+
+### Pretrained-model first
+
+Hệ thống dùng model đã được huấn luyện sẵn qua provider adapter, prompting, retrieval và structured output. Model là dependency có thể thay thế; domain knowledge nằm trong semantic catalog, glossary, approved joins và evaluation fixtures. Training hoặc fine-tuning không phải điều kiện để hoàn thành các gate hiện tại.
 
 ### Least privilege
 
@@ -378,7 +385,7 @@ Danh sách và trạng thái được quản lý trong `docs/decisions/`.
 
 ## 23. Open questions
 
-- Use case và persona đầu tiên là gì?
+- Persona chính và ranh giới chi tiết của vertical slice supplier delivery là gì?
 - Nguồn dữ liệu, owner và classification cụ thể ra sao?
 - Metric nào được phê duyệt cho MVP?
 - Database và SQL dialect nào là target?
@@ -387,7 +394,19 @@ Danh sách và trạng thái được quản lý trong `docs/decisions/`.
 - Audit/conversation/result phải lưu trong bao lâu?
 - Deployment và compliance constraints là gì?
 
-## 24. Standards và tài liệu tham khảo
+## 24. Future work — model training và fine-tuning
+
+Training, supervised fine-tuning, preference optimization hoặc execution-aware reinforcement learning chỉ được đưa vào phạm vi khi đồng thời có:
+
+- Baseline training-free đã đạt Gate C/D và có release manifest tái lập được;
+- Failure taxonomy cho thấy lỗi còn lại đến từ model capability, không phải metric contract, retrieval, schema, prompt, validator hoặc dữ liệu;
+- Dataset question/plan/SQL/error đã được owner review, có quyền sử dụng và không chứa dữ liệu nhạy cảm ngoài policy;
+- Evaluation set độc lập, chống leakage và có tiêu chí so sánh quality, security, latency và cost;
+- Compute budget, vận hành model, rollback và model-version governance được phê duyệt bằng ADR.
+
+Future work này không thay thế semantic layer, AST/policy validation, read-only execution hoặc result verification. Model đã fine-tune vẫn phải đi qua cùng workflow và release gate.
+
+## 25. Standards và tài liệu tham khảo
 
 - [C4 Model](https://c4model.com/) — biểu diễn system context, container và component.
 - [Architectural Decision Records](https://adr.github.io/) — quản lý quyết định và rationale.

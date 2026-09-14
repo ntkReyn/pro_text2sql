@@ -6,6 +6,10 @@ Sản phẩm cho phép người dùng nghiệp vụ đặt câu hỏi bằng ng�
 
 Giá trị cần kiểm chứng của sản phẩm là giảm thời gian từ câu hỏi nghiệp vụ đến một câu trả lời có thể đánh giá, đồng thời duy trì tính nhất quán của KPI và quyền truy cập dữ liệu.
 
+Phạm vi triển khai đầu tiên được chốt là **supplier delivery performance**: xếp hạng và so sánh nhà cung cấp theo các metric giao hàng đã được phê duyệt, có thể phân tích theo thời gian, warehouse và region. Inventory snapshot là lát cắt kế tiếp để hỗ trợ câu hỏi về trạng thái tồn kho hiện tại; quản lý tài sản và các domain vận hành khác thuộc phạm vi mở rộng sau khi vertical slice đầu tiên đạt evaluation gate.
+
+Phiên bản hiện tại sử dụng mô hình đã được huấn luyện sẵn thông qua adapter, prompting và structured output. Huấn luyện model mới hoặc fine-tuning không phải mục tiêu của MVP.
+
 ## 2. Vấn đề cần giải quyết
 
 - Người dùng nghiệp vụ không phải lúc nào cũng có khả năng viết SQL.
@@ -50,14 +54,16 @@ Danh sách này phải được xác nhận bằng phỏng vấn và quan sát q
 - Bảng, biểu đồ cơ bản và evidence;
 - Feedback có phân loại lỗi.
 
-### Chức năng sau MVP
+### Chức năng sau MVP / Future work
 
 - Follow-up nhiều lượt phức tạp;
 - Drill-down nhiều cấp;
 - Saved query và chia sẻ kết quả;
 - Evaluation dashboard;
 - Quản trị metric qua giao diện;
-- Tích hợp thêm domain dữ liệu.
+- Tích hợp thêm domain dữ liệu;
+- Forecasting hoặc prescriptive analytics có model và evaluation riêng;
+- Huấn luyện hoặc fine-tuning model khi baseline chứng minh đây là nút thắt cần giải quyết.
 
 ### Ngoài phạm vi
 
@@ -66,6 +72,7 @@ Danh sách này phải được xác nhận bằng phỏng vấn và quan sát q
 - Tự định nghĩa KPI;
 - Khẳng định quan hệ nhân quả từ dữ liệu mô tả;
 - Forecasting khi chưa có model, dữ liệu và backtest riêng;
+- Huấn luyện model, fine-tuning hoặc reinforcement learning trong phạm vi MVP;
 - Truy cập tùy ý vào mọi schema/table.
 
 ## 6. Use cases ưu tiên
@@ -80,6 +87,21 @@ Danh sách này phải được xác nhận bằng phỏng vấn và quan sát q
 | UC-06 | Từ chối an toàn khi không có dữ liệu hoặc không có quyền | P0 |
 | UC-07 | Tiếp tục câu hỏi dựa trên metric/filter của lượt trước | P1 |
 | UC-08 | Giải thích contribution hoặc biến động theo dimension | P1 |
+
+### Ví dụ câu hỏi theo phạm vi
+
+Các câu hỏi phù hợp với MVP:
+
+- “Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 3 tháng gần đây?”;
+- “So sánh tỷ lệ giao hàng đúng hạn giữa các khu vực trong quý này”;
+- “Xu hướng số lượng giao trễ theo tuần thay đổi như thế nào?”;
+- “Mặt hàng nào đang có tồn kho thấp hơn reorder point đã được phê duyệt?”.
+
+Các câu hỏi sau cần được diễn giải hoặc chuyển sang future work:
+
+- “Mặt hàng nào có nguy cơ thiếu tồn kho trong 30 ngày tới?” chỉ được hỗ trợ khi “nguy cơ” là một rule/metric đã phê duyệt; dự báo nhu cầu hoặc stockout thuộc forecasting future work.
+- “Chi phí vận hành tăng do đâu?” được trả lời dưới dạng dimension hoặc nhóm chi phí đóng góp vào mức tăng; hệ thống không khẳng định quan hệ nhân quả nếu chỉ có dữ liệu mô tả.
+- “Đề xuất vấn đề cần ưu tiên” phải dựa trên metric, threshold hoặc ranking đã được phê duyệt; hệ thống không tự tạo hành động prescriptive.
 
 ## 7. User journeys
 
@@ -234,7 +256,7 @@ Feedback không tự động trở thành ground truth. Trường hợp ảnh h�
 
 ## 16. Open questions
 
-- Persona và use case đầu tiên;
+- Persona chính và quyết định nghiệp vụ cụ thể trong vertical slice supplier delivery;
 - Danh sách metric MVP và owner;
 - Nguồn dữ liệu và freshness requirement;
 - Người dùng nào được xem SQL hoặc raw rows;
@@ -242,6 +264,8 @@ Feedback không tự động trở thành ground truth. Trường hợp ảnh h�
 - Quality, latency, cost và availability targets;
 - Retention cho question, result, audit và feedback;
 - Human review policy cho câu hỏi có tác động cao.
+
+Việc lựa chọn dữ liệu huấn luyện, chiến lược fine-tuning hoặc reward không phải open question của MVP. Các nội dung này chỉ được mở lại theo tiêu chí future work trong roadmap.
 
 ## 17. Liên kết tài liệu
 

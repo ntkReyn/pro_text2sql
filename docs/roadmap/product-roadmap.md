@@ -8,11 +8,11 @@ Roadmap không cam kết ngày giao hàng khi chưa xác định quy mô đội 
 
 Tài liệu liên quan:
 
-- [Yêu cầu sản phẩm](../product/README.md)
-- [Kiến trúc hệ thống](../architecture/README.md)
-- [Thiết kế dữ liệu](../data/README.md)
-- [Sổ tay vận hành](../operations/README.md)
-- [Quyết định kiến trúc](../decisions/README.md)
+- [Yêu cầu sản phẩm](../product/product-requirements.md)
+- [Kiến trúc hệ thống](../architecture/system-architecture.md)
+- [Thiết kế dữ liệu](../data/data-design-governance.md)
+- [Sổ tay vận hành](../operations/operations-runbook.md)
+- [Quyết định kiến trúc](../decisions/architecture-decision-records.md)
 
 ## 2. Nguyên tắc lập kế hoạch
 
@@ -23,6 +23,7 @@ Tài liệu liên quan:
 5. Ưu tiên rủi ro có hậu quả cao: truy cập sai dữ liệu, KPI sai, join fan-out, dữ liệu cũ và prompt injection.
 6. Chỉ thêm component khi có yêu cầu hoặc số liệu chứng minh; lựa chọn lớn phải có ADR.
 7. Demo, UAT và production pilot là ba mức sẵn sàng khác nhau.
+8. Các gate hiện tại dùng pretrained LLM qua prompting, retrieval và structured output; training hoặc fine-tuning được tách thành future work.
 
 ## 3. Tổng quan giai đoạn
 
@@ -47,7 +48,7 @@ Một phạm vi đầu tiên đủ hẹp để triển khai, có giá trị đ�
 
 - Xác định persona, domain con và quyết định nghiệp vụ cần hỗ trợ.
 - Thu thập câu hỏi thực tế đã loại bỏ dữ liệu nhạy cảm.
-- Chọn một hoặc hai vertical slice đầu tiên.
+- Xác nhận vertical slice đầu tiên là supplier delivery performance; inventory status chỉ được thêm sau khi phạm vi, dữ liệu và metric của lát cắt đầu đạt Gate B.
 - Lập inventory nguồn dữ liệu, quyền truy cập, freshness và vấn đề chất lượng đã biết.
 - Xây business glossary ban đầu và danh sách metric cần owner xác nhận.
 - Xác định hậu quả khi câu trả lời sai và loại câu hỏi không được hỗ trợ.
@@ -358,14 +359,36 @@ Hoãn trước:
 
 - multi-agent orchestration;
 - nhiều model/provider;
+- huấn luyện model, fine-tuning và reinforcement learning;
 - vector hoặc graph database khi retrieval đơn giản đủ dùng;
 - chart recommendation phức tạp;
 - tự động tạo insight mở rộng;
 - đa domain và tùy biến sâu cho từng tenant.
 
-## 14. Thông tin cần chốt để lập kế hoạch giao hàng
+## 14. Future work — model training và fine-tuning
 
-- Persona/domain/use case đầu tiên;
+Training hoặc fine-tuning không thuộc các Gate A–F hiện tại. Hướng này chỉ được mở lại sau khi hệ thống training-free có baseline đáng tin cậy và failure analysis chứng minh prompting, retrieval, semantic plan, deterministic validation và dữ liệu không còn là nguyên nhân chính.
+
+### Điều kiện bắt đầu
+
+- Có đủ dữ liệu question → semantic plan → SQL/result đã được review và có quyền sử dụng;
+- Có tập evaluation tách biệt, versioned và kiểm tra leakage;
+- Có baseline theo metric selection, plan accuracy, result correctness, security, latency và cost;
+- Có nhóm lỗi lặp lại mà fine-tuning được kỳ vọng cải thiện và có ablation để kiểm chứng;
+- Có ADR cho model ownership, compute, privacy, deployment, rollback và retention.
+
+### Hướng có thể nghiên cứu
+
+- Supervised fine-tuning cho semantic planning hoặc SQL repair theo error taxonomy;
+- Preference optimization cho lựa chọn plan/candidate khi có dữ liệu preference đáng tin cậy;
+- Execution-aware training khi reward không khuyến khích query chỉ “chạy được” nhưng sai metric hoặc grain;
+- Model nhỏ chuyên biệt nếu tổng chi phí vận hành thấp hơn provider model mà vẫn đạt release gate.
+
+Kết quả fine-tuning không được miễn bất kỳ semantic, security, execution hoặc result-verification control nào của kiến trúc hiện tại.
+
+## 15. Thông tin cần chốt để lập kế hoạch giao hàng
+
+- Persona chính và danh sách use case cụ thể cho supplier delivery;
 - team size, vai trò và mức phân bổ;
 - nguồn dữ liệu, data owner và thời điểm được cấp quyền;
 - database dialect và môi trường deploy;
