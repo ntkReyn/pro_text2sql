@@ -1,0 +1,42 @@
+# Version control and local tooling
+.git
+.github
+.agents
+.codex
+.idea
+.vscode
+
+# Secrets and local environment overrides
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python and Node.js build artifacts
+**/__pycache__/
+**/*.py[cod]
+.venv/
+venv/
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/node_modules/
+**/.next/
+**/.next-dev/
+**/dist/
+**/build/
+
+# Local caches, data, notebooks, and generated reports
+.cache/
+data/raw/
+data/staging/
+data/local/
+notebooks/
+evals/reports/generated/
+
+# Local logs and operating-system files
+**/*.log
+**/*.tmp
+.DS_Store
+Thumbs.db
+Desktop.ini

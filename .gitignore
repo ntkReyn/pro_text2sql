@@ -29,6 +29,7 @@ htmlcov/
 # Node.js and frontend builds
 node_modules/
 .next/
+.next-dev/
 .nuxt/
 .svelte-kit/
 .vite/
@@ -46,6 +47,7 @@ pnpm-debug.log*
 *.log
 *.pid
 *.tmp
+*.tsbuildinfo
 tmp/
 temp/
 .cache/

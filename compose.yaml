@@ -1,0 +1,36 @@
+name: pro-text2sql
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pro-text2sql:local
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: "8000"
+      EMBEDDING_DEVICE: cpu
+      RERANKER_DEVICE: cpu
+      EMBEDDING_LOCAL_FILES_ONLY: "true"
+      HF_HOME: /opt/huggingface
+      HF_HUB_OFFLINE: "true"
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - type: bind
+        source: ${HF_CACHE_HOST_PATH:?Set HF_CACHE_HOST_PATH in .env}
+        target: /opt/huggingface
+        read_only: true
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+

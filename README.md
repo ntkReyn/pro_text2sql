@@ -84,6 +84,42 @@ Không cần triển khai toàn bộ agent ngay từ đầu. Với các luồng 
 
 Phạm vi hiện tại dùng pretrained LLM qua prompting, retrieval và structured output. Training, fine-tuning và reinforcement learning được để ở future work sau khi có baseline, failure taxonomy và evaluation gate đáng tin cậy.
 
+## Chạy bằng một Docker container
+
+Ứng dụng được đóng gói thành một image CPU và chạy bằng một service duy nhất trong `compose.yaml`. Supabase và OpenAI là dịch vụ bên ngoài. Hai model Hugging Face local được mount read-only từ cache trên máy host, không được sao chép vào image.
+
+1. Sao chép `.env.example` thành `.env` và điền credential runtime.
+2. Đặt `HF_CACHE_HOST_PATH` thành thư mục Hugging Face trên máy host. Trên máy hiện tại:
+
+   ```env
+   HF_CACHE_HOST_PATH=C:/Users/Admin/.cache/huggingface
+   ```
+
+3. Build và khởi động container:
+
+   ```powershell
+   docker compose build
+   docker compose up -d
+   ```
+
+4. Kiểm tra API:
+
+   ```powershell
+   Invoke-RestMethod http://localhost:8000/health/live
+   Invoke-RestMethod http://localhost:8000/health/ready
+   ```
+
+`/health/live` xác nhận tiến trình API đang chạy. `/health/ready` chỉ trả `200` khi Supabase URL, OpenAI key và cả hai model cache đều sẵn sàng; endpoint chỉ trả trạng thái boolean và không trả credential.
+
+Các lệnh vận hành cơ bản:
+
+```powershell
+docker compose logs -f app
+docker compose down
+```
+
+Container chạy bằng non-root user, root filesystem read-only và không có Linux capabilities. File `.env` bị loại khỏi Docker build context; credential chỉ được nạp tại runtime.
+
 ## Quy ước ban đầu
 
 - Tên thư mục và module dùng `snake_case`; tên sản phẩm/API có thể dùng quy ước riêng của framework.
@@ -95,6 +131,6 @@ Phạm vi hiện tại dùng pretrained LLM qua prompting, retrieval và structu
 
 ## Trạng thái hiện tại
 
-Repository đang ở giai đoạn scaffold. Các file `.gitkeep` chỉ giữ chỗ cho những thư mục chưa có mã nguồn; khi thư mục có nội dung thật, có thể xóa file đó.
+Repository đang ở giai đoạn scaffold. API hiện có health/readiness endpoint và Docker baseline; workflow Text-to-SQL chưa được triển khai. Các file `.gitkeep` chỉ giữ chỗ cho những thư mục chưa có mã nguồn; khi thư mục có nội dung thật, có thể xóa file đó.
 
 Điểm bắt đầu của bộ tài liệu dự án: [docs/index.md](docs/index.md).

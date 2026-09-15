@@ -1,0 +1,23 @@
+{
+  "catalog_version": "1.0.0",
+  "locale": "vi-VN",
+  "terms": [
+    {
+      "term": "giao trễ",
+      "aliases": ["giao hàng trễ", "trễ hạn", "late delivery"],
+      "metric_candidates": ["late_delivery_rate", "late_completed_po_line_count"],
+      "clarification": "Bạn muốn tỷ lệ PO line giao trễ hay số PO line giao trễ?"
+    },
+    {
+      "term": "đúng hạn",
+      "aliases": ["giao đúng hẹn", "on time", "on-time"],
+      "metric_candidates": ["on_time_delivery_rate"]
+    },
+    {
+      "term": "kém nhất",
+      "aliases": ["tệ nhất", "hiệu suất thấp nhất"],
+      "metric_candidates": [],
+      "clarification": "Bạn muốn đánh giá theo tỷ lệ giao trễ, tỷ lệ đúng hạn hay số ngày trễ trung bình?"
+    }
+  ]
+}

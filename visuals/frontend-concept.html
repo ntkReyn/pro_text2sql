@@ -1,0 +1,1647 @@
+<div id="atlasiq-concept">
+  <style>
+    #atlasiq-concept {
+      color-scheme: light dark;
+      --atlas-bg: light-dark(#f4f7fb, #071019);
+      --atlas-surface: light-dark(#ffffff, #0d1823);
+      --atlas-surface-2: light-dark(#f7f9fc, #111f2c);
+      --atlas-surface-3: light-dark(#eef3f8, #172635);
+      --atlas-text: light-dark(#14213a, #edf4fb);
+      --atlas-muted: light-dark(#68758a, #9dafc0);
+      --atlas-border: light-dark(#dce4ed, #263949);
+      --atlas-accent: #5b5ce2;
+      --atlas-accent-2: #14b8a6;
+      --atlas-accent-soft: light-dark(#ececfe, #1d2552);
+      --atlas-positive: #16a67a;
+      --atlas-warning: #d6932f;
+      --atlas-danger: #e05c66;
+      --atlas-shadow: light-dark(0 24px 70px rgba(31, 48, 77, 0.14), 0 28px 80px rgba(0, 0, 0, 0.42));
+      --atlas-radius: 18px;
+      --atlas-motion: 1;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--atlas-text);
+      width: 100%;
+    }
+
+    #atlasiq-concept * {
+      box-sizing: border-box;
+    }
+
+    #atlasiq-concept button,
+    #atlasiq-concept input,
+    #atlasiq-concept textarea {
+      font: inherit;
+    }
+
+    #atlasiq-concept button {
+      color: inherit;
+    }
+
+    #atlasiq-concept .atlas-previewbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      flex-wrap: wrap;
+    }
+
+    #atlasiq-concept .atlas-preview-label {
+      color: var(--atlas-muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    #atlasiq-concept .atlas-preview-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--atlas-surface-3);
+      border-radius: 12px;
+    }
+
+    #atlasiq-concept .atlas-preview-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #atlasiq-concept .atlas-preview-theme {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--atlas-surface-3);
+      color: var(--atlas-muted);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    #atlasiq-concept .atlas-preview-theme:hover {
+      color: var(--atlas-text);
+      background: var(--atlas-accent-soft);
+    }
+
+    #atlasiq-concept .atlas-preview-theme svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    #atlasiq-concept .atlas-preview-tabs button {
+      border: 0;
+      background: transparent;
+      color: var(--atlas-muted);
+      padding: 8px 12px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background calc(180ms * var(--atlas-motion)) ease, color calc(180ms * var(--atlas-motion)) ease, transform calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-preview-tabs button:hover {
+      color: var(--atlas-text);
+      transform: translateY(calc(-1px * var(--atlas-motion)));
+    }
+
+    #atlasiq-concept .atlas-preview-tabs button[aria-pressed="true"] {
+      background: var(--atlas-surface);
+      color: var(--atlas-text);
+      box-shadow: 0 2px 10px light-dark(rgba(31, 48, 77, 0.08), rgba(0, 0, 0, 0.24));
+    }
+
+    #atlasiq-concept .atlas-window {
+      width: 100%;
+      overflow: hidden;
+      background: var(--atlas-bg);
+      border: 1px solid var(--atlas-border);
+      border-radius: calc(var(--atlas-radius) + 6px);
+      box-shadow: var(--atlas-shadow);
+    }
+
+    #atlasiq-concept .atlas-screen {
+      display: none;
+      min-height: 720px;
+      background: var(--atlas-bg);
+    }
+
+    #atlasiq-concept .atlas-screen.is-active {
+      display: flex;
+      animation: atlas-enter calc(320ms * var(--atlas-motion)) cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    @keyframes atlas-enter {
+      from { opacity: 0.65; transform: translateY(calc(5px * var(--atlas-motion))); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #atlasiq-concept .atlas-sidebar {
+      width: 214px;
+      flex: 0 0 214px;
+      padding: 20px 14px 16px;
+      background: light-dark(#101c33, #09131d);
+      color: #eef5ff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+
+    #atlasiq-concept .atlas-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 2px 8px 24px;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    #atlasiq-concept .atlas-brand-mark {
+      width: 31px;
+      height: 31px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--atlas-accent), var(--atlas-accent-2));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 9px 24px color-mix(in srgb, var(--atlas-accent) 35%, transparent);
+    }
+
+    #atlasiq-concept .atlas-brand-mark span {
+      width: 12px;
+      height: 12px;
+      border: 2px solid #fff;
+      border-radius: 50% 50% 50% 3px;
+      transform: rotate(-45deg);
+    }
+
+    #atlasiq-concept .atlas-nav-label {
+      padding: 0 10px 8px;
+      color: rgba(238,245,255,.48);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    #atlasiq-concept .atlas-nav {
+      display: grid;
+      gap: 4px;
+    }
+
+    #atlasiq-concept .atlas-nav button {
+      border: 0;
+      background: transparent;
+      color: rgba(238,245,255,.68);
+      min-height: 42px;
+      border-radius: 11px;
+      padding: 0 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 13px;
+      transition: background calc(180ms * var(--atlas-motion)) ease, color calc(180ms * var(--atlas-motion)) ease, transform calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-nav button:hover {
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      transform: translateX(calc(2px * var(--atlas-motion)));
+    }
+
+    #atlasiq-concept .atlas-nav button.is-current {
+      background: linear-gradient(90deg, color-mix(in srgb, var(--atlas-accent) 42%, transparent), color-mix(in srgb, var(--atlas-accent) 16%, transparent));
+      color: #fff;
+    }
+
+    #atlasiq-concept .atlas-nav svg,
+    #atlasiq-concept .atlas-icon-button svg,
+    #atlasiq-concept .atlas-query-submit svg,
+    #atlasiq-concept .atlas-sso svg,
+    #atlasiq-concept .atlas-auth-submit svg,
+    #atlasiq-concept .atlas-evidence-toggle svg {
+      width: 16px;
+      height: 16px;
+      flex: none;
+    }
+
+    #atlasiq-concept .atlas-sidebar-spacer {
+      flex: 1;
+      min-height: 28px;
+    }
+
+    #atlasiq-concept .atlas-user {
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,.09);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    #atlasiq-concept .atlas-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ffb27d, #d56578);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-user-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    #atlasiq-concept .atlas-user-copy strong,
+    #atlasiq-concept .atlas-user-copy span {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #atlasiq-concept .atlas-user-copy strong {
+      color: #f5f8fc;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-user-copy span {
+      color: rgba(238,245,255,.48);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    #atlasiq-concept .atlas-app-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #atlasiq-concept .atlas-topbar {
+      height: 66px;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--atlas-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: color-mix(in srgb, var(--atlas-surface) 90%, transparent);
+    }
+
+    #atlasiq-concept .atlas-workspace {
+      min-width: 0;
+    }
+
+    #atlasiq-concept .atlas-workspace strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-workspace span {
+      display: block;
+      color: var(--atlas-muted);
+      font-size: 11px;
+      margin-top: 3px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    #atlasiq-concept .atlas-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #atlasiq-concept .atlas-freshness {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--atlas-positive);
+      background: color-mix(in srgb, var(--atlas-positive) 10%, transparent);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-freshness::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--atlas-positive) 14%, transparent);
+    }
+
+    #atlasiq-concept .atlas-icon-button {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--atlas-border);
+      border-radius: 11px;
+      background: var(--atlas-surface);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: var(--atlas-muted);
+      transition: color calc(180ms * var(--atlas-motion)) ease, transform calc(180ms * var(--atlas-motion)) ease, border-color calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-icon-button:hover {
+      color: var(--atlas-text);
+      border-color: color-mix(in srgb, var(--atlas-accent) 45%, var(--atlas-border));
+      transform: translateY(calc(-1px * var(--atlas-motion)));
+    }
+
+    #atlasiq-concept .atlas-content {
+      width: min(100%, 1120px);
+      margin: 0 auto;
+      padding: 34px 32px 38px;
+    }
+
+    #atlasiq-concept .atlas-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--atlas-accent);
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 9px;
+    }
+
+    #atlasiq-concept .atlas-hero h1 {
+      margin: 0;
+      font-size: clamp(25px, 3.2vw, 38px);
+      line-height: 1.12;
+      letter-spacing: -0.045em;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-hero p {
+      margin: 10px 0 0;
+      color: var(--atlas-muted);
+      max-width: 650px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    #atlasiq-concept .atlas-composer {
+      margin-top: 23px;
+      background: var(--atlas-surface);
+      border: 1px solid var(--atlas-border);
+      border-radius: var(--atlas-radius);
+      padding: 14px;
+      box-shadow: 0 16px 44px light-dark(rgba(31,48,77,.08), rgba(0,0,0,.19));
+      transition: border-color calc(180ms * var(--atlas-motion)) ease, box-shadow calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-composer:focus-within {
+      border-color: color-mix(in srgb, var(--atlas-accent) 55%, var(--atlas-border));
+      box-shadow: 0 18px 48px color-mix(in srgb, var(--atlas-accent) 10%, transparent);
+    }
+
+    #atlasiq-concept .atlas-composer textarea {
+      display: block;
+      width: 100%;
+      min-height: 62px;
+      resize: vertical;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--atlas-text);
+      font-size: 15px;
+      line-height: 1.5;
+      padding: 3px 4px;
+    }
+
+    #atlasiq-concept .atlas-composer textarea::placeholder {
+      color: color-mix(in srgb, var(--atlas-muted) 78%, transparent);
+    }
+
+    #atlasiq-concept .atlas-composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    #atlasiq-concept .atlas-context {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    #atlasiq-concept .atlas-context button {
+      border: 0;
+      background: var(--atlas-surface-2);
+      color: var(--atlas-muted);
+      padding: 7px 10px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 11px;
+      transition: background calc(160ms * var(--atlas-motion)) ease, color calc(160ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-context button:hover {
+      background: var(--atlas-accent-soft);
+      color: var(--atlas-accent);
+    }
+
+    #atlasiq-concept .atlas-query-submit {
+      border: 0;
+      min-height: 40px;
+      padding: 0 14px 0 16px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--atlas-accent), color-mix(in srgb, var(--atlas-accent) 70%, #2538a8));
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 8px 22px color-mix(in srgb, var(--atlas-accent) 27%, transparent);
+      transition: transform calc(180ms * var(--atlas-motion)) ease, box-shadow calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-query-submit:hover {
+      transform: translateY(calc(-2px * var(--atlas-motion)));
+      box-shadow: 0 12px 27px color-mix(in srgb, var(--atlas-accent) 35%, transparent);
+    }
+
+    #atlasiq-concept .atlas-query-submit.is-running svg {
+      animation: atlas-spin calc(900ms * max(var(--atlas-motion), .01)) linear infinite;
+    }
+
+    @keyframes atlas-spin { to { transform: rotate(360deg); } }
+
+    #atlasiq-concept .atlas-stage-line {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      margin: 13px 0 0;
+      opacity: 0;
+      transform: translateY(calc(-4px * var(--atlas-motion)));
+      max-height: 0;
+      overflow: hidden;
+      transition: opacity calc(220ms * var(--atlas-motion)) ease, transform calc(220ms * var(--atlas-motion)) ease, max-height calc(220ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-stage-line.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 58px;
+    }
+
+    #atlasiq-concept .atlas-stage {
+      position: relative;
+      padding: 8px 8px 8px 20px;
+      border-radius: 9px;
+      background: var(--atlas-surface-2);
+      color: var(--atlas-muted);
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #atlasiq-concept .atlas-stage::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--atlas-border);
+    }
+
+    #atlasiq-concept .atlas-stage.is-done {
+      color: var(--atlas-positive);
+      background: color-mix(in srgb, var(--atlas-positive) 8%, transparent);
+    }
+
+    #atlasiq-concept .atlas-stage.is-done::before {
+      background: var(--atlas-positive);
+    }
+
+    #atlasiq-concept .atlas-stage.is-active {
+      color: var(--atlas-accent);
+      background: var(--atlas-accent-soft);
+    }
+
+    #atlasiq-concept .atlas-stage.is-active::before {
+      background: var(--atlas-accent);
+      box-shadow: 0 0 0 5px color-mix(in srgb, var(--atlas-accent) 13%, transparent);
+      animation: atlas-pulse calc(900ms * max(var(--atlas-motion), .01)) ease-in-out infinite alternate;
+    }
+
+    @keyframes atlas-pulse { to { box-shadow: 0 0 0 8px color-mix(in srgb, var(--atlas-accent) 3%, transparent); } }
+
+    #atlasiq-concept .atlas-results {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(250px, .75fr);
+      gap: 16px;
+      margin-top: 17px;
+      transition: opacity calc(200ms * var(--atlas-motion)) ease, transform calc(200ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-results.is-refreshing {
+      opacity: .42;
+      transform: translateY(calc(4px * var(--atlas-motion)));
+    }
+
+    #atlasiq-concept .atlas-result-panel,
+    #atlasiq-concept .atlas-evidence {
+      background: var(--atlas-surface);
+      border: 1px solid var(--atlas-border);
+      border-radius: var(--atlas-radius);
+    }
+
+    #atlasiq-concept .atlas-result-panel {
+      padding: 20px;
+    }
+
+    #atlasiq-concept .atlas-result-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    #atlasiq-concept .atlas-result-title span {
+      display: block;
+      color: var(--atlas-muted);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    #atlasiq-concept .atlas-result-title h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-verified {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--atlas-positive);
+      font-size: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    #atlasiq-concept .atlas-verified svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    #atlasiq-concept .atlas-highlight {
+      display: flex;
+      align-items: baseline;
+      gap: 9px;
+      margin: 20px 0 16px;
+    }
+
+    #atlasiq-concept .atlas-highlight strong {
+      font-size: clamp(28px, 4vw, 41px);
+      font-weight: 500;
+      letter-spacing: -0.05em;
+      color: var(--atlas-accent);
+    }
+
+    #atlasiq-concept .atlas-highlight span {
+      color: var(--atlas-muted);
+      font-size: 12px;
+    }
+
+    #atlasiq-concept .atlas-bars {
+      display: grid;
+      gap: 11px;
+    }
+
+    #atlasiq-concept .atlas-bar-row {
+      display: grid;
+      grid-template-columns: minmax(82px, 1fr) 2.2fr 42px;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+
+    #atlasiq-concept .atlas-bar-row > span:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #atlasiq-concept .atlas-bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--atlas-surface-3);
+      overflow: hidden;
+    }
+
+    #atlasiq-concept .atlas-bar-fill {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--atlas-accent), var(--atlas-accent-2));
+      transform-origin: left;
+      animation: atlas-grow calc(600ms * var(--atlas-motion)) cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    @keyframes atlas-grow { from { transform: scaleX(.15); } to { transform: scaleX(1); } }
+
+    #atlasiq-concept .atlas-bar-row > strong {
+      font-weight: 500;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #atlasiq-concept .atlas-insight {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      margin-top: 17px;
+      padding-top: 15px;
+      border-top: 1px solid var(--atlas-border);
+      color: var(--atlas-muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    #atlasiq-concept .atlas-insight svg {
+      width: 15px;
+      height: 15px;
+      color: var(--atlas-accent-2);
+      flex: none;
+      margin-top: 1px;
+    }
+
+    #atlasiq-concept .atlas-evidence {
+      padding: 17px;
+      align-self: start;
+    }
+
+    #atlasiq-concept .atlas-evidence-toggle {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    #atlasiq-concept .atlas-evidence-toggle > span:first-child {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-evidence-toggle > svg {
+      transition: transform calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-evidence-toggle[aria-expanded="false"] > svg {
+      transform: rotate(-90deg);
+    }
+
+    #atlasiq-concept .atlas-evidence-body {
+      display: grid;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    #atlasiq-concept .atlas-evidence-body[hidden] {
+      display: none;
+    }
+
+    #atlasiq-concept .atlas-evidence-item {
+      display: grid;
+      gap: 3px;
+    }
+
+    #atlasiq-concept .atlas-evidence-item span {
+      color: var(--atlas-muted);
+      font-size: 10px;
+    }
+
+    #atlasiq-concept .atlas-evidence-item strong {
+      font-size: 11px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    #atlasiq-concept .atlas-divider {
+      height: 1px;
+      background: var(--atlas-border);
+    }
+
+    #atlasiq-concept .atlas-code-button {
+      border: 0;
+      background: var(--atlas-surface-2);
+      color: var(--atlas-muted);
+      border-radius: 10px;
+      padding: 9px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    #atlasiq-concept .atlas-code-button:hover {
+      color: var(--atlas-accent);
+      background: var(--atlas-accent-soft);
+    }
+
+    #atlasiq-concept .atlas-auth-screen {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(300px, 1.05fr) minmax(380px, .95fr);
+      background: var(--atlas-surface);
+    }
+
+    #atlasiq-concept .atlas-auth-story {
+      position: relative;
+      overflow: hidden;
+      padding: 42px;
+      color: #f4f8ff;
+      background:
+        radial-gradient(circle at 18% 14%, color-mix(in srgb, var(--atlas-accent-2) 38%, transparent), transparent 28%),
+        radial-gradient(circle at 76% 78%, color-mix(in srgb, var(--atlas-accent) 58%, transparent), transparent 34%),
+        linear-gradient(145deg, #0b1930 3%, #111935 50%, #0a2029 100%);
+      display: flex;
+      flex-direction: column;
+      min-height: 720px;
+    }
+
+    #atlasiq-concept .atlas-auth-story::before,
+    #atlasiq-concept .atlas-auth-story::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: .55;
+      pointer-events: none;
+    }
+
+    #atlasiq-concept .atlas-auth-story::before {
+      width: 220px;
+      height: 220px;
+      top: 28%;
+      right: -85px;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 0 80px color-mix(in srgb, var(--atlas-accent) 46%, transparent) inset;
+      animation: atlas-float calc(8s * max(var(--atlas-motion), .01)) ease-in-out infinite alternate;
+    }
+
+    #atlasiq-concept .atlas-auth-story::after {
+      width: 130px;
+      height: 130px;
+      left: 16%;
+      bottom: 15%;
+      background: color-mix(in srgb, var(--atlas-accent-2) 17%, transparent);
+      animation: atlas-float calc(10s * max(var(--atlas-motion), .01)) ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes atlas-float {
+      to { transform: translate3d(13px, -12px, 0) scale(1.04); }
+    }
+
+    #atlasiq-concept .atlas-auth-brand {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-auth-copy {
+      position: relative;
+      z-index: 1;
+      margin: auto 0;
+      max-width: 490px;
+    }
+
+    #atlasiq-concept .atlas-auth-eyebrow {
+      color: #73e6d7;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    #atlasiq-concept .atlas-auth-copy h2 {
+      margin: 14px 0 14px;
+      font-size: clamp(30px, 4.3vw, 50px);
+      line-height: 1.03;
+      letter-spacing: -0.055em;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-auth-copy p {
+      color: rgba(238,245,255,.68);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 430px;
+      margin: 0;
+    }
+
+    #atlasiq-concept .atlas-proof {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    #atlasiq-concept .atlas-proof span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(238,245,255,.72);
+      font-size: 11px;
+    }
+
+    #atlasiq-concept .atlas-proof svg {
+      width: 13px;
+      height: 13px;
+      color: #73e6d7;
+    }
+
+    #atlasiq-concept .atlas-auth-form-wrap {
+      padding: 45px clamp(28px, 6vw, 74px);
+      display: grid;
+      place-items: center;
+      background: var(--atlas-surface);
+    }
+
+    #atlasiq-concept .atlas-auth-form {
+      width: min(100%, 390px);
+    }
+
+    #atlasiq-concept .atlas-auth-form h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-auth-form > p {
+      margin: 9px 0 25px;
+      color: var(--atlas-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #atlasiq-concept .atlas-sso {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--atlas-border);
+      border-radius: 12px;
+      background: var(--atlas-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: border-color calc(180ms * var(--atlas-motion)) ease, background calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-sso:hover {
+      border-color: color-mix(in srgb, var(--atlas-accent) 55%, var(--atlas-border));
+      background: var(--atlas-surface-2);
+    }
+
+    #atlasiq-concept .atlas-or {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--atlas-muted);
+      font-size: 10px;
+      margin: 18px 0;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+
+    #atlasiq-concept .atlas-or::before,
+    #atlasiq-concept .atlas-or::after {
+      content: "";
+      height: 1px;
+      background: var(--atlas-border);
+      flex: 1;
+    }
+
+    #atlasiq-concept .atlas-field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    #atlasiq-concept .atlas-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    #atlasiq-concept .atlas-field label {
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-input-wrap {
+      position: relative;
+    }
+
+    #atlasiq-concept .atlas-input-wrap > svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      color: var(--atlas-muted);
+      pointer-events: none;
+    }
+
+    #atlasiq-concept .atlas-input-wrap input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--atlas-border);
+      border-radius: 12px;
+      background: var(--atlas-surface-2);
+      color: var(--atlas-text);
+      outline: 0;
+      padding: 0 41px 0 38px;
+      font-size: 12px;
+      transition: border-color calc(180ms * var(--atlas-motion)) ease, box-shadow calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-input-wrap input:focus {
+      border-color: var(--atlas-accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--atlas-accent) 13%, transparent);
+    }
+
+    #atlasiq-concept .atlas-password-toggle {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 34px;
+      height: 34px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--atlas-muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    #atlasiq-concept .atlas-password-toggle:hover {
+      background: var(--atlas-surface-3);
+      color: var(--atlas-text);
+    }
+
+    #atlasiq-concept .atlas-password-toggle svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    #atlasiq-concept .atlas-auth-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 3px 0 16px;
+      font-size: 11px;
+    }
+
+    #atlasiq-concept .atlas-checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--atlas-muted);
+      cursor: pointer;
+    }
+
+    #atlasiq-concept .atlas-checkbox input {
+      accent-color: var(--atlas-accent);
+      width: 15px;
+      height: 15px;
+    }
+
+    #atlasiq-concept .atlas-text-link {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--atlas-accent);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #atlasiq-concept .atlas-auth-submit {
+      width: 100%;
+      min-height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--atlas-accent), color-mix(in srgb, var(--atlas-accent) 72%, #202d92));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0 11px 25px color-mix(in srgb, var(--atlas-accent) 24%, transparent);
+      transition: transform calc(180ms * var(--atlas-motion)) ease, box-shadow calc(180ms * var(--atlas-motion)) ease;
+    }
+
+    #atlasiq-concept .atlas-auth-submit:hover {
+      transform: translateY(calc(-2px * var(--atlas-motion)));
+      box-shadow: 0 14px 30px color-mix(in srgb, var(--atlas-accent) 32%, transparent);
+    }
+
+    #atlasiq-concept .atlas-switch-auth {
+      text-align: center;
+      color: var(--atlas-muted);
+      font-size: 11px;
+      margin-top: 17px;
+    }
+
+    #atlasiq-concept .atlas-auth-status {
+      min-height: 18px;
+      margin-top: 11px;
+      color: var(--atlas-positive);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    #atlasiq-concept .atlas-terms {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      color: var(--atlas-muted);
+      font-size: 10px;
+      line-height: 1.5;
+      margin: 2px 0 16px;
+      cursor: pointer;
+    }
+
+    #atlasiq-concept .atlas-terms input {
+      flex: none;
+      width: 15px;
+      height: 15px;
+      margin-top: 1px;
+      accent-color: var(--atlas-accent);
+    }
+
+    @media (max-width: 840px) {
+      #atlasiq-concept .atlas-screen {
+        min-height: auto;
+      }
+
+      #atlasiq-concept .atlas-screen-app.is-active {
+        display: block;
+      }
+
+      #atlasiq-concept .atlas-sidebar {
+        width: 100%;
+        padding: 12px 14px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.07);
+      }
+
+      #atlasiq-concept .atlas-brand {
+        padding: 0;
+      }
+
+      #atlasiq-concept .atlas-nav-label,
+      #atlasiq-concept .atlas-sidebar-spacer,
+      #atlasiq-concept .atlas-user-copy,
+      #atlasiq-concept .atlas-user {
+        display: none;
+      }
+
+      #atlasiq-concept .atlas-nav {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      #atlasiq-concept .atlas-nav button {
+        width: 42px;
+        padding: 0;
+        justify-content: center;
+      }
+
+      #atlasiq-concept .atlas-nav button span {
+        display: none;
+      }
+
+      #atlasiq-concept .atlas-results {
+        grid-template-columns: 1fr;
+      }
+
+      #atlasiq-concept .atlas-auth-screen {
+        grid-template-columns: 1fr;
+      }
+
+      #atlasiq-concept .atlas-auth-story {
+        min-height: 310px;
+        padding: 30px;
+      }
+
+      #atlasiq-concept .atlas-auth-copy {
+        margin: auto 0 28px;
+      }
+
+      #atlasiq-concept .atlas-auth-copy h2 {
+        max-width: 550px;
+      }
+
+      #atlasiq-concept .atlas-auth-form-wrap {
+        padding: 38px 26px 44px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      #atlasiq-concept .atlas-previewbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      #atlasiq-concept .atlas-preview-tabs {
+        width: 100%;
+      }
+
+      #atlasiq-concept .atlas-preview-actions {
+        width: 100%;
+      }
+
+      #atlasiq-concept .atlas-preview-tabs {
+        flex: 1;
+      }
+
+      #atlasiq-concept .atlas-preview-tabs button {
+        flex: 1 0 auto;
+      }
+
+      #atlasiq-concept .atlas-topbar {
+        padding: 0 16px;
+      }
+
+      #atlasiq-concept .atlas-freshness {
+        display: none;
+      }
+
+      #atlasiq-concept .atlas-content {
+        padding: 26px 16px 30px;
+      }
+
+      #atlasiq-concept .atlas-composer-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      #atlasiq-concept .atlas-query-submit {
+        justify-content: center;
+        width: 100%;
+      }
+
+      #atlasiq-concept .atlas-composer textarea {
+        min-height: 96px;
+      }
+
+      #atlasiq-concept .atlas-stage-line {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #atlasiq-concept .atlas-stage-line.is-visible {
+        max-height: 110px;
+      }
+
+      #atlasiq-concept .atlas-result-head {
+        flex-direction: column;
+      }
+
+      #atlasiq-concept .atlas-bar-row {
+        grid-template-columns: minmax(70px, 1fr) 1.5fr 38px;
+        gap: 7px;
+      }
+
+      #atlasiq-concept .atlas-auth-story {
+        padding: 26px 22px;
+      }
+
+      #atlasiq-concept .atlas-auth-copy h2 {
+        font-size: 32px;
+      }
+
+      #atlasiq-concept .atlas-auth-form-wrap {
+        padding: 32px 20px 38px;
+      }
+
+      #atlasiq-concept .atlas-field-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      #atlasiq-concept .atlas-auth-options {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #atlasiq-concept {
+        --atlas-motion: 0;
+      }
+
+      #atlasiq-concept *,
+      #atlasiq-concept *::before,
+      #atlasiq-concept *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+
+  <div class="atlas-previewbar">
+    <span class="atlas-preview-label">Concept UI · AtlasIQ</span>
+    <div class="atlas-preview-actions">
+      <div class="atlas-preview-tabs" aria-label="Chọn màn hình xem trước">
+        <button type="button" data-screen-target="app" aria-label="Không gian phân tích" aria-pressed="true">Phân tích</button>
+        <button type="button" data-screen-target="login" aria-pressed="false">Đăng nhập</button>
+        <button type="button" data-screen-target="register" aria-pressed="false">Đăng ký</button>
+      </div>
+      <button class="atlas-preview-theme" id="atlas-theme-preview" type="button" aria-label="Xem giao diện tối"><i data-lucide="moon" aria-hidden="true"></i></button>
+    </div>
+  </div>
+
+  <div class="atlas-window" aria-label="Bản xem trước giao diện AtlasIQ">
+    <section class="atlas-screen atlas-screen-app is-active" data-screen="app" aria-label="Không gian phân tích">
+      <aside class="atlas-sidebar">
+        <div class="atlas-brand">
+          <span class="atlas-brand-mark" aria-hidden="true"><span></span></span>
+          <span>AtlasIQ</span>
+        </div>
+        <div class="atlas-nav-label">Không gian làm việc</div>
+        <nav class="atlas-nav" aria-label="Điều hướng chính">
+          <button class="is-current" type="button"><i data-lucide="sparkles" aria-hidden="true"></i><span>Hỏi dữ liệu</span></button>
+          <button type="button"><i data-lucide="message-square" aria-hidden="true"></i><span>Cuộc hội thoại</span></button>
+          <button type="button"><i data-lucide="book-open" aria-hidden="true"></i><span>Thư viện metric</span></button>
+          <button type="button"><i data-lucide="shield-check" aria-hidden="true"></i><span>Đánh giá & audit</span></button>
+        </nav>
+        <div class="atlas-sidebar-spacer"></div>
+        <div class="atlas-user">
+          <span class="atlas-avatar">MA</span>
+          <span class="atlas-user-copy"><strong>Minh Anh</strong><span>Supply Chain Lead</span></span>
+          <i data-lucide="chevron-down" aria-hidden="true"></i>
+        </div>
+      </aside>
+
+      <div class="atlas-app-main">
+        <header class="atlas-topbar">
+          <div class="atlas-workspace">
+            <strong>Supplier performance</strong>
+            <span>Vietnam Operations · Dữ liệu đã được cấp quyền</span>
+          </div>
+          <div class="atlas-top-actions">
+            <span class="atlas-freshness">Cập nhật 08:35</span>
+            <button class="atlas-icon-button" type="button" aria-label="Trợ giúp"><i data-lucide="circle-help" aria-hidden="true"></i></button>
+            <button class="atlas-icon-button" type="button" aria-label="Thông báo"><i data-lucide="bell" aria-hidden="true"></i></button>
+          </div>
+        </header>
+
+        <main class="atlas-content">
+          <section class="atlas-hero">
+            <div class="atlas-kicker"><i data-lucide="sparkles" aria-hidden="true"></i> Phân tích có kiểm chứng</div>
+            <h1>Hôm nay bạn muốn hiểu điều gì?</h1>
+            <p>Hỏi bằng ngôn ngữ tự nhiên. AtlasIQ sẽ dùng metric đã phê duyệt, kiểm tra truy vấn và cho bạn thấy bằng chứng đằng sau kết quả.</p>
+          </section>
+
+          <section class="atlas-composer" aria-label="Nhập câu hỏi phân tích">
+            <textarea id="atlas-question" aria-label="Câu hỏi" placeholder="Ví dụ: Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 90 ngày gần đây?">Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 90 ngày gần đây?</textarea>
+            <div class="atlas-composer-footer">
+              <div class="atlas-context" aria-label="Gợi ý câu hỏi">
+                <button type="button" data-prompt="So sánh tỷ lệ giao đúng hạn giữa các khu vực trong quý này">So sánh theo khu vực</button>
+                <button type="button" data-prompt="Xu hướng số lượng giao trễ theo tuần thay đổi như thế nào?">Xem xu hướng</button>
+                <button type="button" data-prompt="Nhà cung cấp nào cải thiện nhiều nhất so với quý trước?">So với quý trước</button>
+              </div>
+              <button class="atlas-query-submit" id="atlas-run-query" type="button"><span>Phân tích</span><i data-lucide="arrow-up" aria-hidden="true"></i></button>
+            </div>
+            <div class="atlas-stage-line" id="atlas-stages" aria-live="polite">
+              <div class="atlas-stage">Hiểu câu hỏi</div>
+              <div class="atlas-stage">Kiểm tra metric</div>
+              <div class="atlas-stage">Tạo truy vấn</div>
+              <div class="atlas-stage">Xác minh kết quả</div>
+            </div>
+          </section>
+
+          <section class="atlas-results" id="atlas-results" aria-live="polite">
+            <article class="atlas-result-panel">
+              <div class="atlas-result-head">
+                <div class="atlas-result-title">
+                  <span>Kết quả · 90 ngày gần đây</span>
+                  <h2>Nhà cung cấp có tỷ lệ giao hàng trễ cao nhất</h2>
+                </div>
+                <span class="atlas-verified"><i data-lucide="shield-check" aria-hidden="true"></i> Đã xác minh</span>
+              </div>
+
+              <div class="atlas-highlight"><strong>18,6%</strong><span>Vina Components · 43 / 231 đơn hàng</span></div>
+
+              <div class="atlas-bars" role="img" aria-label="Biểu đồ xếp hạng tỷ lệ giao hàng trễ của 5 nhà cung cấp">
+                <div class="atlas-bar-row"><span>Vina Components</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:100%"></span></span><strong>18,6%</strong></div>
+                <div class="atlas-bar-row"><span>Eastbridge</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:85%"></span></span><strong>15,8%</strong></div>
+                <div class="atlas-bar-row"><span>Pacific Parts</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:71%"></span></span><strong>13,2%</strong></div>
+                <div class="atlas-bar-row"><span>Mekong Supply</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:59%"></span></span><strong>11,0%</strong></div>
+                <div class="atlas-bar-row"><span>Northstar</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:48%"></span></span><strong>8,9%</strong></div>
+              </div>
+
+              <div class="atlas-insight"><i data-lucide="sparkles" aria-hidden="true"></i><span>Vina Components cao hơn mức trung bình nhóm 6,1 điểm phần trăm. Kết quả mang tính mô tả; cần xem thêm warehouse và nhóm sản phẩm để điều tra.</span></div>
+            </article>
+
+            <aside class="atlas-evidence">
+              <button class="atlas-evidence-toggle" id="atlas-evidence-toggle" type="button" aria-expanded="true" aria-controls="atlas-evidence-body">
+                <span><i data-lucide="database" aria-hidden="true"></i>Bằng chứng</span>
+                <i data-lucide="chevron-down" aria-hidden="true"></i>
+              </button>
+              <div class="atlas-evidence-body" id="atlas-evidence-body">
+                <div class="atlas-evidence-item"><span>Metric</span><strong>Late delivery rate · v1.2</strong></div>
+                <div class="atlas-evidence-item"><span>Công thức</span><strong>Đơn giao trễ / đơn đủ điều kiện</strong></div>
+                <div class="atlas-evidence-item"><span>Bộ lọc</span><strong>90 ngày · Không gồm đơn hủy</strong></div>
+                <div class="atlas-evidence-item"><span>Grain</span><strong>Supplier</strong></div>
+                <div class="atlas-evidence-item"><span>Độ mới dữ liệu</span><strong>08:35 · 14/09/2026</strong></div>
+                <div class="atlas-divider"></div>
+                <button class="atlas-code-button" type="button"><i data-lucide="code-2" aria-hidden="true"></i>Xem truy vấn đã kiểm tra</button>
+              </div>
+            </aside>
+          </section>
+        </main>
+      </div>
+    </section>
+
+    <section class="atlas-screen" data-screen="login" aria-label="Màn hình đăng nhập">
+      <div class="atlas-auth-screen">
+        <div class="atlas-auth-story">
+          <div class="atlas-auth-brand"><span class="atlas-brand-mark" aria-hidden="true"><span></span></span><span>AtlasIQ</span></div>
+          <div class="atlas-auth-copy">
+            <span class="atlas-auth-eyebrow">Từ câu hỏi đến quyết định</span>
+            <h2>Dữ liệu phức tạp.<br>Câu trả lời rõ ràng.</h2>
+            <p>Khám phá hiệu suất chuỗi cung ứng bằng ngôn ngữ tự nhiên, với metric nhất quán và bằng chứng có thể kiểm tra.</p>
+          </div>
+          <div class="atlas-proof">
+            <span><i data-lucide="shield-check" aria-hidden="true"></i>Truy cập theo quyền</span>
+            <span><i data-lucide="check" aria-hidden="true"></i>SQL được kiểm tra</span>
+            <span><i data-lucide="clock-3" aria-hidden="true"></i>Hiển thị độ mới dữ liệu</span>
+          </div>
+        </div>
+
+        <div class="atlas-auth-form-wrap">
+          <form class="atlas-auth-form" data-auth-form="login">
+            <h1>Chào mừng trở lại</h1>
+            <p>Đăng nhập để tiếp tục không gian phân tích của bạn.</p>
+            <button class="atlas-sso" type="button"><i data-lucide="building-2" aria-hidden="true"></i>Tiếp tục với SSO doanh nghiệp</button>
+            <div class="atlas-or">hoặc dùng email</div>
+            <div class="atlas-field">
+              <label for="atlas-login-email">Email công việc</label>
+              <div class="atlas-input-wrap"><i data-lucide="mail" aria-hidden="true"></i><input id="atlas-login-email" type="email" value="minhanh@company.vn" autocomplete="email"></div>
+            </div>
+            <div class="atlas-field">
+              <label for="atlas-login-password">Mật khẩu</label>
+              <div class="atlas-input-wrap"><i data-lucide="key-round" aria-hidden="true"></i><input id="atlas-login-password" type="password" value="demopassword" autocomplete="current-password"><button class="atlas-password-toggle" type="button" aria-label="Hiện mật khẩu"><i data-lucide="eye" aria-hidden="true"></i></button></div>
+            </div>
+            <div class="atlas-auth-options">
+              <label class="atlas-checkbox"><input type="checkbox" checked>Ghi nhớ đăng nhập</label>
+              <button class="atlas-text-link" type="button">Quên mật khẩu?</button>
+            </div>
+            <button class="atlas-auth-submit" type="submit">Đăng nhập<i data-lucide="arrow-right" aria-hidden="true"></i></button>
+            <div class="atlas-auth-status" aria-live="polite"></div>
+            <div class="atlas-switch-auth">Chưa có tài khoản? <button class="atlas-text-link" type="button" data-go-register>Đăng ký ngay</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="atlas-screen" data-screen="register" aria-label="Màn hình đăng ký">
+      <div class="atlas-auth-screen">
+        <div class="atlas-auth-story">
+          <div class="atlas-auth-brand"><span class="atlas-brand-mark" aria-hidden="true"><span></span></span><span>AtlasIQ</span></div>
+          <div class="atlas-auth-copy">
+            <span class="atlas-auth-eyebrow">Bắt đầu có kiểm soát</span>
+            <h2>Một không gian chung.<br>Một định nghĩa KPI.</h2>
+            <p>Tạo workspace cho đội ngũ, kết nối nguồn dữ liệu đã duyệt và bắt đầu từ vertical slice supplier performance.</p>
+          </div>
+          <div class="atlas-proof">
+            <span><i data-lucide="lock-keyhole" aria-hidden="true"></i>Bảo vệ dữ liệu</span>
+            <span><i data-lucide="users" aria-hidden="true"></i>Vai trò rõ ràng</span>
+            <span><i data-lucide="bar-chart-3" aria-hidden="true"></i>Metric có phiên bản</span>
+          </div>
+        </div>
+
+        <div class="atlas-auth-form-wrap">
+          <form class="atlas-auth-form" data-auth-form="register">
+            <h1>Tạo tài khoản</h1>
+            <p>Bắt đầu với thông tin công việc. Bạn có thể cấu hình workspace sau.</p>
+            <div class="atlas-field-row">
+              <div class="atlas-field">
+                <label for="atlas-register-name">Họ và tên</label>
+                <div class="atlas-input-wrap"><i data-lucide="user" aria-hidden="true"></i><input id="atlas-register-name" type="text" placeholder="Minh Anh" autocomplete="name"></div>
+              </div>
+              <div class="atlas-field">
+                <label for="atlas-register-company">Tổ chức</label>
+                <div class="atlas-input-wrap"><i data-lucide="building-2" aria-hidden="true"></i><input id="atlas-register-company" type="text" placeholder="Công ty ABC" autocomplete="organization"></div>
+              </div>
+            </div>
+            <div class="atlas-field">
+              <label for="atlas-register-email">Email công việc</label>
+              <div class="atlas-input-wrap"><i data-lucide="mail" aria-hidden="true"></i><input id="atlas-register-email" type="email" placeholder="ban@company.vn" autocomplete="email"></div>
+            </div>
+            <div class="atlas-field">
+              <label for="atlas-register-password">Mật khẩu</label>
+              <div class="atlas-input-wrap"><i data-lucide="key-round" aria-hidden="true"></i><input id="atlas-register-password" type="password" placeholder="Tối thiểu 8 ký tự" autocomplete="new-password"><button class="atlas-password-toggle" type="button" aria-label="Hiện mật khẩu"><i data-lucide="eye" aria-hidden="true"></i></button></div>
+            </div>
+            <label class="atlas-terms"><input type="checkbox" required><span>Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật của AtlasIQ.</span></label>
+            <button class="atlas-auth-submit" type="submit">Tạo tài khoản<i data-lucide="arrow-right" aria-hidden="true"></i></button>
+            <div class="atlas-auth-status" aria-live="polite"></div>
+            <div class="atlas-switch-auth">Đã có tài khoản? <button class="atlas-text-link" type="button" data-go-login>Đăng nhập</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById('atlasiq-concept');
+      const screenButtons = [...root.querySelectorAll('[data-screen-target]')];
+      const screens = [...root.querySelectorAll('[data-screen]')];
+      const question = root.querySelector('#atlas-question');
+      const runButton = root.querySelector('#atlas-run-query');
+      const stagesWrap = root.querySelector('#atlas-stages');
+      const stages = [...stagesWrap.querySelectorAll('.atlas-stage')];
+      const results = root.querySelector('#atlas-results');
+      const evidenceToggle = root.querySelector('#atlas-evidence-toggle');
+      const evidenceBody = root.querySelector('#atlas-evidence-body');
+      const themePreview = root.querySelector('#atlas-theme-preview');
+      let runTimers = [];
+      let darkPreview = false;
+
+      function showScreen(name) {
+        screens.forEach((screen) => screen.classList.toggle('is-active', screen.dataset.screen === name));
+        screenButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.screenTarget === name)));
+      }
+
+      screenButtons.forEach((button) => button.addEventListener('click', () => showScreen(button.dataset.screenTarget)));
+      root.querySelector('[data-go-register]').addEventListener('click', () => showScreen('register'));
+      root.querySelector('[data-go-login]').addEventListener('click', () => showScreen('login'));
+
+      root.querySelectorAll('[data-prompt]').forEach((button) => {
+        button.addEventListener('click', () => {
+          question.value = button.dataset.prompt;
+          question.focus();
+        });
+      });
+
+      function clearRunTimers() {
+        runTimers.forEach((timer) => clearTimeout(timer));
+        runTimers = [];
+      }
+
+      function setStage(activeIndex) {
+        stages.forEach((stage, index) => {
+          stage.classList.toggle('is-done', index < activeIndex);
+          stage.classList.toggle('is-active', index === activeIndex);
+        });
+      }
+
+      runButton.addEventListener('click', () => {
+        clearRunTimers();
+        runButton.classList.add('is-running');
+        runButton.querySelector('span').textContent = 'Đang phân tích';
+        runButton.querySelector('svg')?.remove();
+        const refreshIcon = document.createElement('i');
+        refreshIcon.setAttribute('data-lucide', 'refresh-cw');
+        refreshIcon.setAttribute('aria-hidden', 'true');
+        runButton.appendChild(refreshIcon);
+        if (globalThis.lucide) globalThis.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        stagesWrap.classList.add('is-visible');
+        results.classList.add('is-refreshing');
+        setStage(0);
+
+        [1, 2, 3].forEach((stageIndex) => {
+          runTimers.push(setTimeout(() => setStage(stageIndex), 430 * stageIndex));
+        });
+
+        runTimers.push(setTimeout(() => {
+          stages.forEach((stage) => {
+            stage.classList.remove('is-active');
+            stage.classList.add('is-done');
+          });
+          results.classList.remove('is-refreshing');
+          runButton.classList.remove('is-running');
+          runButton.innerHTML = '<span>Phân tích lại</span><i data-lucide="check" aria-hidden="true"></i>';
+          if (globalThis.lucide) globalThis.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+        }, 1750));
+      });
+
+      evidenceToggle.addEventListener('click', () => {
+        const expanded = evidenceToggle.getAttribute('aria-expanded') === 'true';
+        evidenceToggle.setAttribute('aria-expanded', String(!expanded));
+        evidenceBody.hidden = expanded;
+      });
+
+      themePreview.addEventListener('click', () => {
+        darkPreview = !darkPreview;
+        root.style.colorScheme = darkPreview ? 'dark' : 'light';
+        themePreview.setAttribute('aria-label', darkPreview ? 'Xem giao diện sáng' : 'Xem giao diện tối');
+        themePreview.innerHTML = `<i data-lucide="${darkPreview ? 'sun' : 'moon'}" aria-hidden="true"></i>`;
+        if (globalThis.lucide) globalThis.lucide.createIcons({ attrs: { width: 16, height: 16 } });
+      });
+
+      root.querySelectorAll('.atlas-password-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+          const input = button.parentElement.querySelector('input');
+          const show = input.type === 'password';
+          input.type = show ? 'text' : 'password';
+          button.setAttribute('aria-label', show ? 'Ẩn mật khẩu' : 'Hiện mật khẩu');
+          button.innerHTML = `<i data-lucide="${show ? 'eye-off' : 'eye'}" aria-hidden="true"></i>`;
+          if (globalThis.lucide) globalThis.lucide.createIcons({ attrs: { width: 15, height: 15 } });
+        });
+      });
+
+      root.querySelectorAll('[data-auth-form]').forEach((form) => {
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const status = form.querySelector('.atlas-auth-status');
+          status.textContent = form.dataset.authForm === 'login'
+            ? 'Xác thực thành công · Đang mở workspace…'
+            : 'Tài khoản mẫu đã sẵn sàng · Kiểm tra email để xác minh.';
+        });
+      });
+
+      const themeState = { palette: 'aurora', radius: 18, motion: true };
+      const palettes = {
+        aurora: ['#5b5ce2', '#14b8a6'],
+        emerald: ['#167b68', '#39a6a3'],
+        copper: ['#b85d3b', '#d89b45']
+      };
+
+      function applyTheme() {
+        const colors = palettes[themeState.palette];
+        root.style.setProperty('--atlas-accent', colors[0]);
+        root.style.setProperty('--atlas-accent-2', colors[1]);
+        root.style.setProperty('--atlas-radius', `${themeState.radius}px`);
+        root.style.setProperty('--atlas-motion', themeState.motion ? '1' : '0');
+      }
+
+      applyTheme();
+      if (globalThis.Tweak) {
+        const tweak = new Tweak({ container: root, onChange: applyTheme });
+        tweak.addSelect(themeState, 'palette', {
+          label: 'Bảng màu',
+          options: [
+            { label: 'Aurora tím–ngọc', value: 'aurora' },
+            { label: 'Emerald tin cậy', value: 'emerald' },
+            { label: 'Copper ấm áp', value: 'copper' }
+          ],
+          reference: 'theme.palette'
+        });
+        tweak.addSlider(themeState, 'radius', { label: 'Độ bo góc', min: 8, max: 28, unit: 'px', reference: '--atlas-radius' });
+        tweak.addToggle(themeState, 'motion', { label: 'Animation', reference: 'theme.motion' });
+      }
+    })();
+  </script>
+</div>

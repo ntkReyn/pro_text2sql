@@ -65,7 +65,7 @@ Chưa có ADR được phê duyệt. Các quyết định cần xử lý:
 | ADR-0009 | SQL parser và policy implementation | Proposed | Dialect corpus và security test results |
 | ADR-0010 | State/audit storage và retention | Proposed | Privacy, volume, recovery và compliance |
 | ADR-0011 | Authentication và authorization model | Proposed | Identity provider, role matrix và data classification |
-| ADR-0012 | Deployment platform và topology | Proposed | Hosting constraints, budget và compliance |
+| [ADR-0012](0012-package-mvp-as-single-application-container.md) | Package MVP thành một application container | Accepted | Một container, Supabase/OpenAI external, model cache mount read-only |
 | ADR-0013 | Release quality và security gates | Proposed | Evaluation baseline và risk tolerance |
 
 Khi bắt đầu review một quyết định, tạo file ADR tương ứng và thay dòng trong bảng bằng liên kết tới file đó.
