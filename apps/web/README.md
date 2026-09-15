@@ -39,9 +39,17 @@ Các màn hình đã có:
 
 Authentication chưa kết nối backend hoặc identity provider. Form demo không gửi credential ra ngoài. Role được lưu trong `sessionStorage` chỉ để trình diễn UI; bản production phải lấy role/data scope từ session do backend xác thực và kiểm tra quyền ở server. Role chọn khi đăng ký là yêu cầu chờ Workspace Admin phê duyệt, không phải cơ chế tự cấp quyền.
 
+Màn `Cuộc trò chuyện` đã nối vào FastAPI baseline qua Next.js route `/api/baseline`. Câu hỏi được gửi tới `POST /api/v1/query/baseline` và UI hiển thị answerability status, metric, dimensions, filters, time range, grain và SQL đã biên dịch. Backend hiện chưa thực thi database nên UI không hiển thị một con số giả. SQL chỉ được render cho role Data Analyst và Metric Steward trong demo; đây chưa phải authorization enforcement phía server.
+
 ## Chạy local
 
 Từ repository root:
+
+```powershell
+python -m uvicorn apps.api.main:app --reload --port 8000
+```
+
+Trong terminal khác:
 
 ```powershell
 cd apps/web
@@ -49,7 +57,27 @@ npm install
 npm run dev
 ```
 
+`npm run dev` khởi động cả FastAPI mới tại `127.0.0.1:8000`, chờ OpenAPI xác
+nhận route `/api/v1/query/baseline`, rồi mới khởi động Next.js tại cổng `3000`.
+Nhấn `Ctrl+C` một lần để dừng cả hai. Có thể chỉ chạy từng phía bằng `npm run
+dev:api` hoặc `npm run dev:web`.
+
 Mở `http://localhost:3000`.
+
+Next.js proxy mặc định gọi `http://localhost:8000`. Có thể đổi bằng biến server-side `ANALYTICS_API_BASE_URL`.
+
+Nếu `/api/baseline` báo backend thiếu endpoint, hãy dừng tiến trình API cũ và chạy
+đúng entrypoint từ repository root. Uvicorn không có `--reload` sẽ không tự nhận
+route mới sau khi source thay đổi:
+
+```powershell
+python -m uvicorn apps.api.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Hydration warning có thuộc tính `bis_skin_checked` hoặc `bis_register` là do browser
+extension chèn DOM trước khi React hydrate. Kiểm tra bằng cửa sổ Incognito không bật
+extension hoặc tắt extension đó cho `localhost`; không thêm suppression vào component
+để che lỗi DOM thật.
 
 Build production:
 

@@ -50,7 +50,7 @@ ID không được tái sử dụng. Title mô tả quyết định hoặc kết
 
 ## 5. Decision log
 
-Chưa có ADR được phê duyệt. Các quyết định cần xử lý:
+Decision log hiện tại:
 
 | ID | Quyết định | Trạng thái | Điều kiện để quyết định |
 |---|---|---|---|
@@ -65,8 +65,10 @@ Chưa có ADR được phê duyệt. Các quyết định cần xử lý:
 | ADR-0009 | SQL parser và policy implementation | Proposed | Dialect corpus và security test results |
 | ADR-0010 | State/audit storage và retention | Proposed | Privacy, volume, recovery và compliance |
 | ADR-0011 | Authentication và authorization model | Proposed | Identity provider, role matrix và data classification |
-| [ADR-0012](0012-package-mvp-as-single-application-container.md) | Package MVP thành một application container | Accepted | Một container, Supabase/OpenAI external, model cache mount read-only |
+| [ADR-0012](0012-package-mvp-as-single-application-container.md) | Package MVP thành một application container | Superseded | Được thay thế bởi ADR-0014 |
 | ADR-0013 | Release quality và security gates | Proposed | Evaluation baseline và risk tolerance |
+| [ADR-0014](0014-run-local-mvp-with-postgresql.md) | Chạy MVP local với PostgreSQL trong Compose | Accepted | Một application service, PostgreSQL và migration runner local |
+| [ADR-0015](0015-use-wren-semantics-with-datus-orchestration.md) | Wren là semantic authority; Datus là orchestrator/memory | Accepted | Custom adapter, một nguồn KPI và baseline parity tests |
 
 Khi bắt đầu review một quyết định, tạo file ADR tương ứng và thay dòng trong bảng bằng liên kết tới file đó.
 

@@ -12,9 +12,9 @@ type Period = "7" | "30" | "90";
 type View = "dashboard" | "query" | "conversations" | "metrics" | "audit" | "login" | "register";
 
 const periodData: Record<Period, { values: number[]; labels: string[] }> = {
-  "7": { values: [91, 93, 92, 95, 94, 96, 96.4], labels: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"] },
-  "30": { values: [89, 91, 90, 93, 92, 94, 95, 94, 96, 96.4], labels: ["16/08", "19/08", "22/08", "25/08", "28/08", "31/08", "03/09", "06/09", "10/09", "14/09"] },
-  "90": { values: [84, 86, 85, 88, 89, 91, 90, 92, 94, 95, 96.4], labels: ["T6", "", "", "T7", "", "", "T8", "", "", "", "T9"] },
+  "7": { values: [68, 72, 70, 75, 74, 77, 76.9], labels: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"] },
+  "30": { values: [65, 69, 68, 72, 71, 74, 75, 73, 77, 76.9], labels: ["16/08", "19/08", "22/08", "25/08", "28/08", "31/08", "03/09", "06/09", "10/09", "14/09"] },
+  "90": { values: [62, 65, 64, 68, 69, 72, 70, 73, 75, 76, 76.9], labels: ["T6", "", "", "T7", "", "", "T8", "", "", "", "T9"] },
 };
 
 const navItems: Array<{ id: View; label: string; icon: typeof LayoutDashboard }> = [
@@ -26,15 +26,14 @@ const navItems: Array<{ id: View; label: string; icon: typeof LayoutDashboard }>
 ];
 
 const alerts = [
-  ["Vina Components", "Tỷ lệ giao trễ tăng 4,8 điểm", "43 / 231 đơn · 90 ngày", "danger"],
-  ["Kho Hà Nội", "12 SKU dưới reorder point", "Cập nhật 18 phút trước", "warning"],
-  ["Pacific Parts", "Độ đúng hạn cải thiện liên tục", "+6,2 điểm so với quý trước", "positive"],
+  ["Trạm Hà Nội 02", "Tỷ lệ phiên sạc thất bại tăng", "1 / 1 phiên đủ điều kiện", "danger"],
+  ["Dòng xe VF6_LAB", "Có phiên sạc thất bại cần kiểm tra", "Dữ liệu quý 3/2026", "warning"],
+  ["Khu vực phía Nam", "Điện năng sạc thành công cao nhất", "403,4 kWh trong dữ liệu mẫu", "positive"],
 ];
 
-const suppliers = [
-  ["Vina Components", "18,6%", "43 / 231"], ["Eastbridge", "15,8%", "31 / 196"],
-  ["Pacific Parts", "13,2%", "27 / 204"], ["Mekong Supply", "11,0%", "19 / 173"],
-  ["Northstar", "8,9%", "16 / 180"],
+const chargingGroups = [
+  ["Khu vực phía Nam", "100%", "5 / 5"], ["Khu vực miền Trung", "66,7%", "2 / 3"],
+  ["Khu vực phía Bắc", "60%", "3 / 5"],
 ];
 
 function go(view: View) { window.location.hash = `/${view}`; }
@@ -47,7 +46,7 @@ function currentView(): View {
 function makeLine(values: number[]) {
   return values.map((value, index) => {
     const x = (index / (values.length - 1)) * 700;
-    const y = 210 - ((value - 80) / 20) * 210;
+    const y = 210 - ((value - 60) / 40) * 210;
     return `${index ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`;
   }).join(" ");
 }
@@ -72,7 +71,7 @@ function ProductShell({ view, children }: { view: View; children: ReactNode }) {
         </nav>
         <div className="sidebar-spacer" />
         <div className="sidebar-trust"><span className="trust-icon"><ShieldCheck /></span><div><strong>Dữ liệu được bảo vệ</strong><span>Quyền truy cập đang hoạt động</span></div></div>
-        <button className="profile-button" type="button" onClick={() => go("login")}><span className="profile-avatar">MA</span><span><strong>Minh Anh</strong><small>Supply Chain Lead</small></span><ChevronDown /></button>
+        <button className="profile-button" type="button" onClick={() => go("login")}><span className="profile-avatar">MA</span><span><strong>Minh Anh</strong><small>EV Operations Analyst</small></span><ChevronDown /></button>
       </aside>
       <main className="main-surface">
         <header className="topbar">
@@ -89,7 +88,7 @@ function Dashboard() {
   const [period, setPeriod] = useState<Period>("30");
   const chart = periodData[period];
   const line = useMemo(() => makeLine(chart.values), [chart.values]);
-  const lastY = 210 - ((chart.values.at(-1)! - 80) / 20) * 210;
+  const lastY = 210 - ((chart.values.at(-1)! - 60) / 40) * 210;
 
   return (
     <div className="dashboard-wrap content-view">
@@ -98,17 +97,17 @@ function Dashboard() {
         <button className="primary-button" type="button" onClick={() => go("query")}><Sparkles />Đặt câu hỏi mới<ArrowRight /></button>
       </section>
       <section className="metric-grid" aria-label="Chỉ số chính">
-        <MetricCard featured icon={<PackageCheck />} label="Tỷ lệ giao đúng hạn" value="96,4%" footer={<><TrendingUp />+2,1 điểm <span>so với kỳ trước</span></>} />
-        <MetricCard icon={<Clock3 />} tone="warm" label="Đơn hàng giao trễ" value="128" footer={<><TrendingDown />−18 đơn <span>trong 30 ngày</span></>} />
-        <MetricCard icon={<TriangleAlert />} tone="danger" label="Supplier cần chú ý" value="07" footer={<><TrendingUp />+2 supplier <span>vượt ngưỡng</span></>} negative />
-        <MetricCard icon={<Gauge />} tone="blue" label="Metric đang theo dõi" value="24" footer={<><Check />100% hợp lệ <span>theo catalog v1.2</span></>} neutral />
+        <MetricCard featured icon={<PackageCheck />} label="Tỷ lệ phiên sạc thành công" value="76,9%" footer={<><TrendingUp />10 / 13 phiên <span>đủ điều kiện</span></>} />
+        <MetricCard icon={<Clock3 />} tone="warm" label="Phiên sạc thất bại" value="03" footer={<><TrendingDown />Quý 3 <span>năm 2026</span></>} />
+        <MetricCard icon={<TriangleAlert />} tone="danger" label="Xe cần theo dõi pin" value="01" footer={<><TrendingUp />SOH dưới 80% <span>trong dữ liệu mẫu</span></>} negative />
+        <MetricCard icon={<Gauge />} tone="blue" label="Metric sạc đang theo dõi" value="05" footer={<><Check />100% hợp lệ <span>theo catalog v1.0</span></>} neutral />
       </section>
       <section className="dashboard-grid primary-row">
         <article className="panel performance-panel">
-          <div className="panel-heading"><div><span className="panel-kicker">Hiệu suất giao hàng</span><h2>Xu hướng giao đúng hạn</h2></div><div className="period-control">{(["7", "30", "90"] as Period[]).map((item) => <button key={item} type="button" className={period === item ? "active" : ""} onClick={() => setPeriod(item)}>{item} ngày</button>)}</div></div>
-          <div className="chart-summary"><strong>96,4%</strong><span><TrendingUp /> Tăng 2,1 điểm</span></div>
-          <div className="line-chart" role="img" aria-label={`Biểu đồ tỷ lệ giao đúng hạn trong ${period} ngày`}>
-            <div className="y-axis"><span>100%</span><span>95%</span><span>90%</span><span>85%</span><span>80%</span></div>
+          <div className="panel-heading"><div><span className="panel-kicker">Hiệu quả sạc</span><h2>Xu hướng phiên sạc thành công</h2></div><div className="period-control">{(["7", "30", "90"] as Period[]).map((item) => <button key={item} type="button" className={period === item ? "active" : ""} onClick={() => setPeriod(item)}>{item} ngày</button>)}</div></div>
+          <div className="chart-summary"><strong>76,9%</strong><span><TrendingUp /> 10 / 13 phiên</span></div>
+          <div className="line-chart" role="img" aria-label={`Biểu đồ tỷ lệ phiên sạc thành công trong ${period} ngày`}>
+            <div className="y-axis"><span>100%</span><span>90%</span><span>80%</span><span>70%</span><span>60%</span></div>
             <svg viewBox="0 0 700 230" preserveAspectRatio="none" aria-hidden="true">
               <defs><linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--brand-indigo)" stopOpacity=".24" /><stop offset="100%" stopColor="var(--brand-indigo)" stopOpacity="0" /></linearGradient><linearGradient id="line-stroke" x1="0" x2="1"><stop offset="0%" stopColor="var(--brand-indigo)" /><stop offset="100%" stopColor="var(--brand-teal)" /></linearGradient></defs>
               <g className="chart-grid-lines">{[0, 52.5, 105, 157.5, 210].map((y) => <line key={y} x1="0" y1={y} x2="700" y2={y} />)}</g>
@@ -124,8 +123,8 @@ function Dashboard() {
         </article>
       </section>
       <section className="dashboard-grid secondary-row">
-        <article className="panel query-panel"><div className="panel-heading"><div><span className="panel-kicker">Bắt đầu nhanh</span><h2>Hỏi dữ liệu của bạn</h2></div><Bot /></div><p>Đặt câu hỏi tự nhiên, hệ thống sẽ dùng metric đã phê duyệt và trả kết quả có bằng chứng.</p><button className="ask-box" type="button" onClick={() => go("query")}><span>Ví dụ: Supplier nào có tỷ lệ giao trễ cao nhất?</span><span className="ask-action"><Sparkles />Hỏi ngay</span></button></article>
-        <article className="panel coverage-panel"><div className="panel-heading"><div><span className="panel-kicker">Phạm vi dữ liệu</span><h2>Độ phủ hiện tại</h2></div><UsersRound /></div><Coverage label="Supplier performance" value="100%" /><Coverage label="Inventory status" value="68%" /></article>
+        <article className="panel query-panel"><div className="panel-heading"><div><span className="panel-kicker">Bắt đầu nhanh</span><h2>Hỏi dữ liệu của bạn</h2></div><Bot /></div><p>Đặt câu hỏi tự nhiên, hệ thống sẽ dùng metric đã phê duyệt và trả kết quả có bằng chứng.</p><button className="ask-box" type="button" onClick={() => go("query")}><span>Ví dụ: Khu vực nào có tỷ lệ sạc thành công thấp nhất?</span><span className="ask-action"><Sparkles />Hỏi ngay</span></button></article>
+        <article className="panel coverage-panel"><div className="panel-heading"><div><span className="panel-kicker">Phạm vi dữ liệu</span><h2>Độ phủ hiện tại</h2></div><UsersRound /></div><Coverage label="EV charging analytics" value="100%" /><Coverage label="Battery & service" value="68%" /></article>
       </section>
     </div>
   );
@@ -140,7 +139,7 @@ function Coverage({ label, value }: { label: string; value: string }) {
 }
 
 function QueryWorkspace() {
-  const [question, setQuestion] = useState("Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 90 ngày gần đây?");
+  const [question, setQuestion] = useState("Tỷ lệ phiên sạc thành công theo khu vực trạm trong quý 3 năm 2026?");
   const [stage, setStage] = useState(-1);
   const [complete, setComplete] = useState(true);
 
@@ -156,17 +155,17 @@ function QueryWorkspace() {
       <section className="workspace-heading"><span className="eyebrow">Phân tích có kiểm chứng</span><h1>Hỏi dữ liệu</h1><p>Đặt câu hỏi tự nhiên và theo dõi cách AtlasIQ kiểm tra câu trả lời.</p></section>
       <form className="query-composer-large" onSubmit={submit}>
         <textarea value={question} onChange={(e) => setQuestion(e.target.value)} aria-label="Câu hỏi phân tích" />
-        <div className="query-composer-foot"><div className="suggestion-row">{["So sánh theo khu vực", "Xem xu hướng theo tuần", "So với quý trước"].map((text) => <button type="button" key={text} onClick={() => setQuestion(text)}>{text}</button>)}</div><button className="primary-button" type="submit" disabled={stage >= 0}>{stage >= 0 ? <LoaderCircle className="spin" /> : <SendHorizontal />}{stage >= 0 ? "Đang phân tích" : "Phân tích"}</button></div>
+        <div className="query-composer-foot"><div className="suggestion-row">{["So sánh theo khu vực trạm", "Xem lỗi sạc theo tuần", "Phân tích theo dòng xe"].map((text) => <button type="button" key={text} onClick={() => setQuestion(text)}>{text}</button>)}</div><button className="primary-button" type="submit" disabled={stage >= 0}>{stage >= 0 ? <LoaderCircle className="spin" /> : <SendHorizontal />}{stage >= 0 ? "Đang phân tích" : "Phân tích"}</button></div>
         <div className={`stage-progress ${stage >= 0 ? "visible" : ""}`} aria-live="polite">{["Hiểu câu hỏi", "Kiểm tra metric", "Tạo truy vấn", "Xác minh kết quả"].map((text, i) => <span key={text} className={stage > i ? "done" : stage === i ? "current" : ""}><Check />{text}</span>)}</div>
       </form>
       <section className={`query-result-layout ${complete ? "ready" : "loading"}`} aria-live="polite">
         <article className="panel result-panel-large">
-          <div className="result-heading"><div><span>Kết quả · 90 ngày gần đây</span><h2>Nhà cung cấp có tỷ lệ giao hàng trễ cao nhất</h2></div><span className="verified-label"><ShieldCheck />Đã xác minh</span></div>
-          <div className="result-highlight"><strong>18,6%</strong><span>Vina Components · 43 / 231 đơn hàng</span></div>
-          <div className="supplier-bars">{suppliers.map(([name, value, sample], i) => <div className="supplier-bar" key={name}><span>{i + 1}</span><strong>{name}</strong><span className="bar-track"><span style={{ width: `${100 - i * 13}%` }} /></span><b>{value}</b><small>{sample}</small></div>)}</div>
-          <div className="result-insight"><Sparkles /><p><strong>Điểm đáng chú ý:</strong> Vina Components cao hơn mức trung bình nhóm 6,1 điểm phần trăm. Nên xem thêm theo warehouse và nhóm sản phẩm.</p></div>
+          <div className="result-heading"><div><span>Kết quả · Quý 3/2026</span><h2>Tỷ lệ phiên sạc thành công theo khu vực trạm</h2></div><span className="verified-label"><ShieldCheck />Đã xác minh</span></div>
+          <div className="result-highlight"><strong>76,9%</strong><span>10 / 13 phiên sạc đủ điều kiện</span></div>
+          <div className="ranking-bars">{chargingGroups.map(([name, value, sample], i) => <div className="ranking-bar" key={name}><span>{i + 1}</span><strong>{name}</strong><span className="bar-track"><span style={{ width: `${100 - i * 20}%` }} /></span><b>{value}</b><small>{sample}</small></div>)}</div>
+          <div className="result-insight"><Sparkles /><p><strong>Điểm đáng chú ý:</strong> Khu vực phía Bắc có tỷ lệ thấp nhất trong dữ liệu mẫu. Nên xem tiếp theo trạm và lý do dừng phiên sạc.</p></div>
         </article>
-        <aside className="panel evidence-panel-large"><div className="evidence-title"><span><Database />Bằng chứng</span><CheckCircle2 /></div><dl><Evidence label="Metric" value="Late delivery rate · v1.2" /><Evidence label="Công thức" value="Đơn giao trễ / đơn đủ điều kiện" /><Evidence label="Bộ lọc" value="90 ngày · Không gồm đơn hủy" /><Evidence label="Grain" value="Supplier" /><Evidence label="Độ mới dữ liệu" value="08:35 · 14/09/2026" /></dl><button className="secondary-button" type="button"><Code2 />Xem truy vấn đã kiểm tra</button></aside>
+        <aside className="panel evidence-panel-large"><div className="evidence-title"><span><Database />Bằng chứng</span><CheckCircle2 /></div><dl><Evidence label="Metric" value="Charging success rate · v1.0" /><Evidence label="Công thức" value="Phiên thành công / phiên hoàn tất hoặc thất bại" /><Evidence label="Bộ lọc" value="Quý 3/2026 · Loại phiên hủy/đang sạc" /><Evidence label="Grain" value="Khu vực trạm" /><Evidence label="Độ mới dữ liệu" value="08:35 · 14/09/2026" /></dl><button className="secondary-button" type="button"><Code2 />Xem truy vấn đã kiểm tra</button></aside>
       </section>
     </div>
   );
@@ -186,17 +185,17 @@ function CollectionPage({ type }: { type: "conversations" | "metrics" | "audit" 
 }
 
 function ConversationList() {
-  const items = ["Top supplier giao trễ trong 90 ngày", "So sánh hiệu suất theo khu vực", "Xu hướng giao đúng hạn theo tuần", "SKU dưới reorder point tại Hà Nội"];
+  const items = ["Tỷ lệ sạc thành công theo khu vực", "Phiên sạc lỗi theo dòng xe", "Xu hướng điện năng sạc theo tuần", "Thời lượng sạc tại trạm công cộng"];
   return <div className="collection-grid">{items.map((item, i) => <button className="collection-card" type="button" key={item} onClick={() => go("query")}><span className="collection-icon"><MessageSquareText /></span><span><strong>{item}</strong><small>{i ? `${i + 1} ngày trước` : "Hôm nay · 09:12"}</small></span><ArrowRight /></button>)}</div>;
 }
 
 function MetricTable() {
-  const rows = [["Tỷ lệ giao đúng hạn", "Supply Chain", "v1.2"], ["Tỷ lệ giao trễ", "Procurement", "v1.2"], ["Số lượng giao trễ", "Operations", "v1.0"], ["Tồn kho dưới reorder point", "Warehouse", "v0.8"]];
+  const rows = [["Tỷ lệ phiên sạc thành công", "Charging Operations", "v1.0"], ["Số phiên sạc thất bại", "Charging Operations", "v1.0"], ["Điện năng sạc thành công", "Energy Analytics", "v1.0"], ["Thời lượng sạc trung bình", "Charging Operations", "v1.0"]];
   return <div className="panel table-panel"><div className="table-header"><span>Metric</span><span>Owner</span><span>Phiên bản</span><span>Trạng thái</span></div>{rows.map(([name, owner, version]) => <div className="table-row" key={name}><span><TableProperties /><strong>{name}</strong></span><span>{owner}</span><span>{version}</span><span className="approved"><CheckCircle2 />Đã duyệt</span></div>)}</div>;
 }
 
 function AuditView() {
-  const items = ["Metric late_delivery_rate v1.2 được sử dụng", "Query #AT-1048 đã xác minh kết quả", "Freshness check hoàn tất", "Catalog supplier-performance được cập nhật"];
+  const items = ["Metric charging_success_rate v1.0 được sử dụng", "Query #AT-1048 đã xác minh kết quả", "Freshness check hoàn tất", "Catalog ev-customer được cập nhật"];
   return <div className="audit-grid"><article className="panel audit-summary"><span className="metric-icon"><ShieldCheck /></span><strong>100%</strong><h2>Truy vấn hợp lệ</h2><p>24/24 truy vấn gần nhất đã qua policy và semantic validation.</p></article><article className="panel audit-feed"><h2>Hoạt động gần đây</h2>{items.map((item, i) => <div key={item}><span className={i === 0 ? "live" : ""} /><p><strong>{item}</strong><small>{i * 14 + 3} phút trước</small></p></div>)}</article></div>;
 }
 

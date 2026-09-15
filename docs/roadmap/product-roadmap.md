@@ -13,6 +13,8 @@ Tài liệu liên quan:
 - [Thiết kế dữ liệu](../data/data-design-governance.md)
 - [Sổ tay vận hành](../operations/operations-runbook.md)
 - [Quyết định kiến trúc](../decisions/architecture-decision-records.md)
+- [Kiến trúc Wren + Datus](../architecture/wren-datus-semantic-architecture.md)
+- [Week 1 gốc](../main_docs/week1.md)
 
 ## 2. Nguyên tắc lập kế hoạch
 
@@ -24,14 +26,29 @@ Tài liệu liên quan:
 6. Chỉ thêm component khi có yêu cầu hoặc số liệu chứng minh; lựa chọn lớn phải có ADR.
 7. Demo, UAT và production pilot là ba mức sẵn sàng khác nhau.
 8. Các gate hiện tại dùng pretrained LLM qua prompting, retrieval và structured output; training hoặc fine-tuning được tách thành future work.
+9. Wren giữ semantic authority mục tiêu; Datus điều phối qua adapter và không tạo semantic source thứ hai.
+10. Planner/compiler rule Week 1 luôn được giữ làm B0 để so sánh trước/sau mọi adapter hoặc model change.
+
+## 2.1 Trạng thái triển khai Week 1
+
+| Hạng mục trong `week1.md` | Artifact hiện có | Trạng thái |
+|---|---|---|
+| 3–6 bảng liên quan | 6 bảng customer/vehicle/battery/station/session/service | Đã tạo |
+| Fake data có seed | SQL fixture + generator JSONL seed `42` | Đã tạo baseline |
+| 15+ business questions | 16 câu basic/intermediate/advanced | Đã tạo |
+| Ground truth | `expected_logic` + typed `expected_plan` cho từng câu | Đã tạo; expected result cần DB run |
+| Baseline | Vietnamese rule planner + deterministic compiler | Đã tạo B0 |
+| Một cải tiến | Value grounding + preliminary sketch + Semantic-DAIL | Đã có B1 deterministic; chưa chạy ablation/embedding |
+
+Không đánh dấu Gate B/C hoàn tất chỉ vì code tồn tại: metric vẫn `draft`, chưa có business owner approval và chưa có execution-result checksum đầy đủ.
 
 ## 3. Tổng quan giai đoạn
 
 | Giai đoạn | Kết quả cần đạt | Cổng nghiệm thu |
 |---|---|---|
 | 0. Discovery | Chốt người dùng, quyết định nghiệp vụ, dữ liệu và rủi ro | A — Problem/Data Ready |
-| 1. Data & SQL Foundation | Data model, metric và canonical SQL đúng trên dữ liệu kiểm thử | B — Foundation Correct |
-| 2. Semantic Text-to-SQL | Câu hỏi rõ ràng tạo được semantic plan và SQL an toàn | C — Semantic Query Ready |
+| 1. Data & SQL Foundation | Data model, metric, 16 ground-truth plans và canonical SQL đúng trên dữ liệu kiểm thử | B — Foundation Correct |
+| 2. Semantic Text-to-SQL | Baseline → Wren adapter; câu hỏi rõ tạo semantic plan và SQL an toàn | C — Semantic Query Ready |
 | 3. Bounded Analytics Workflow | Clarification, follow-up, repair hữu hạn, audit và evaluation | D — Reliability Ready |
 | 4. Product Experience & UAT | Người dùng hoàn thành workflow qua web và hiểu evidence | E — Pilot Candidate |
 | 5. Production Pilot | Access, reliability, privacy, recovery và cost được quản trị | F — Pilot Approved |
@@ -48,7 +65,7 @@ Một phạm vi đầu tiên đủ hẹp để triển khai, có giá trị đ�
 
 - Xác định persona, domain con và quyết định nghiệp vụ cần hỗ trợ.
 - Thu thập câu hỏi thực tế đã loại bỏ dữ liệu nhạy cảm.
-- Xác nhận vertical slice đầu tiên là supplier delivery performance; inventory status chỉ được thêm sau khi phạm vi, dữ liệu và metric của lát cắt đầu đạt Gate B.
+- Xác nhận vertical slice Week 1 gồm Customer360, Vehicle360, battery snapshot, station/charging và service ở 6 bảng; charging là lát cắt time-series sâu nhất, còn telemetry/range estimation được mở sau Gate B/C.
 - Lập inventory nguồn dữ liệu, quyền truy cập, freshness và vấn đề chất lượng đã biết.
 - Xây business glossary ban đầu và danh sách metric cần owner xác nhận.
 - Xác định hậu quả khi câu trả lời sai và loại câu hỏi không được hỗ trợ.
@@ -85,6 +102,7 @@ Hệ thống có mô hình dữ liệu nhỏ, metric contract, seed data và SQL
 - Chốt grain và key của từng fact/dimension cần cho vertical slice.
 - Tạo DDL/migration và approved join graph.
 - Tạo seed/fixture chứa cả trường hợp biên: null, duplicate, partial event, cancellation, time boundary và timezone.
+- Dùng `scripts/generate_ev_customer_data.py --seed 42` cho dữ liệu mở rộng tái lập; giữ fixture SQL nhỏ cho smoke test.
 - Định nghĩa metric gồm công thức, grain, dimension, time semantics, null/zero policy, owner và version.
 - Viết canonical SQL và expected result hoặc checksum.
 - Viết data quality, grain, referential integrity và reconciliation tests.
@@ -120,9 +138,10 @@ Câu hỏi đủ rõ được chuyển thành semantic plan hợp lệ, SQL đú
 
 ```text
 Metric contract + canonical SQL
-  → semantic plan fixture
-  → plan validator
-  → SQL generator
+  → 16 semantic plan fixtures + B0 rule planner
+  → plan validator + local compiler
+  → Wren MDL/Engine parity adapter
+  → Datus custom semantic adapter + Semantic-DAIL retrieval
   → SQL AST/security validator
   → read-only execution
   → answer + evidence
@@ -136,6 +155,8 @@ Metric contract + canonical SQL
 - Tạo semantic catalog, glossary, synonym và approved dimensions.
 - Retrieval metric/schema theo phạm vi người dùng được phép.
 - Xây semantic planner và deterministic plan validator.
+- Dùng Wren làm semantic authority; Datus chỉ orchestration/memory qua custom adapter.
+- Thêm value index, graph-aware expansion và Semantic-DAIL example selector trước LLM planner.
 - Đóng gói LLM provider qua interface có structured output.
 - Sinh SQL theo dialect và kiểm tra AST, allowlist, function, join, statement count.
 - Thực thi read-only với timeout và row limit.
@@ -388,7 +409,7 @@ Kết quả fine-tuning không được miễn bất kỳ semantic, security, ex
 
 ## 15. Thông tin cần chốt để lập kế hoạch giao hàng
 
-- Persona chính và danh sách use case cụ thể cho supplier delivery;
+- Persona chính và danh sách use case cụ thể cho EV charging;
 - team size, vai trò và mức phân bổ;
 - nguồn dữ liệu, data owner và thời điểm được cấp quyền;
 - database dialect và môi trường deploy;

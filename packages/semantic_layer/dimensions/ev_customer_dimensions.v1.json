@@ -1,0 +1,24 @@
+{
+  "catalog_version": "1.1.0",
+  "dimensions": [
+    {"id":"vehicle_model_code","label":"Dòng xe","description":"Mã dòng xe giả lập.","expression":"vehicle_model_code","data_type":"text","aliases_vi":["dòng xe","mẫu xe","model xe"],"allowed_operators":["eq","ne","in"]},
+    {"id":"model_year","label":"Năm mẫu xe","description":"Năm model của xe.","expression":"model_year","data_type":"integer","aliases_vi":["đời xe","năm mẫu xe"],"allowed_operators":["eq","ne","gt","gte","lt","lte","in"]},
+    {"id":"vehicle_status","label":"Trạng thái xe","description":"Trạng thái vận hành hiện tại của xe.","expression":"vehicle_status","data_type":"text","aliases_vi":["trạng thái xe"],"allowed_operators":["eq","ne","in"]},
+    {"id":"customer_segment","label":"Phân khúc khách hàng","description":"Phân khúc nghiệp vụ giả lập của khách hàng.","expression":"customer_segment","data_type":"text","aliases_vi":["phân khúc khách hàng","nhóm khách hàng"],"allowed_operators":["eq","ne","in"]},
+    {"id":"customer_region_code","label":"Khu vực khách hàng","description":"Mã vùng tổng quát của khách hàng giả lập.","expression":"customer_region_code","data_type":"text","aliases_vi":["khu vực khách hàng","vùng khách hàng"],"allowed_operators":["eq","ne","in"]},
+    {"id":"customer_status","label":"Trạng thái khách hàng","description":"Trạng thái hiện tại của khách hàng giả lập.","expression":"customer_status","data_type":"text","aliases_vi":["trạng thái khách hàng"],"allowed_operators":["eq","ne","in"]},
+    {"id":"station_name","label":"Trạm sạc","description":"Tên địa điểm sạc giả lập.","expression":"station_name","data_type":"text","aliases_vi":["trạm sạc","điểm sạc"],"allowed_operators":["eq","ne","in"]},
+    {"id":"station_scope","label":"Loại trạm sạc","description":"Phạm vi sử dụng: public, dealer, workplace hoặc home.","expression":"station_scope","data_type":"text","aliases_vi":["loại trạm","phạm vi trạm"],"allowed_operators":["eq","ne","in"]},
+    {"id":"station_region_code","label":"Khu vực trạm sạc","description":"Mã vùng tổng quát của trạm.","expression":"station_region_code","data_type":"text","aliases_vi":["khu vực trạm","vùng trạm","miền"],"allowed_operators":["eq","ne","in"]},
+    {"id":"province_name","label":"Tỉnh hoặc thành phố","description":"Tỉnh hoặc thành phố giả lập của trạm.","expression":"province_name","data_type":"text","aliases_vi":["tỉnh","thành phố","địa phương"],"allowed_operators":["eq","ne","in"]},
+    {"id":"connector_type","label":"Loại đầu sạc","description":"Loại đầu nối chính của trạm.","expression":"connector_type","data_type":"text","aliases_vi":["đầu sạc","chuẩn sạc"],"allowed_operators":["eq","ne","in"]},
+    {"id":"station_operational_status","label":"Trạng thái trạm","description":"Trạng thái vận hành hiện tại của trạm.","expression":"station_operational_status","data_type":"text","aliases_vi":["trạng thái trạm"],"allowed_operators":["eq","ne","in"]},
+    {"id":"charging_week","label":"Tuần bắt đầu sạc","description":"Ngày đầu tuần chứa thời điểm bắt đầu phiên.","expression":"date_trunc('week', started_at)::date","data_type":"date","aliases_vi":["tuần","theo tuần"],"allowed_operators":["eq","gt","gte","lt","lte","in"]},
+    {"id":"charging_month","label":"Tháng bắt đầu sạc","description":"Ngày đầu tháng chứa thời điểm bắt đầu phiên.","expression":"date_trunc('month', started_at)::date","data_type":"date","aliases_vi":["tháng","theo tháng"],"allowed_operators":["eq","gt","gte","lt","lte","in"]},
+    {"id":"battery_health_band","label":"Nhóm SOH pin","description":"Nhóm mô tả SOH: watch dưới 80, monitor dưới 90, healthy từ 90.","expression":"CASE WHEN state_of_health_pct < 80 THEN 'watch' WHEN state_of_health_pct < 90 THEN 'monitor' ELSE 'healthy' END","data_type":"text","aliases_vi":["nhóm soh","nhóm sức khỏe pin"],"allowed_operators":["eq","ne","in"]},
+    {"id":"service_center_code","label":"Trung tâm dịch vụ","description":"Mã trung tâm dịch vụ giả lập.","expression":"service_center_code","data_type":"text","aliases_vi":["trung tâm dịch vụ","xưởng dịch vụ"],"allowed_operators":["eq","ne","in"]},
+    {"id":"service_visit_type","label":"Loại dịch vụ","description":"Loại lượt dịch vụ.","expression":"visit_type","data_type":"text","aliases_vi":["loại dịch vụ"],"allowed_operators":["eq","ne","in"]},
+    {"id":"service_issue_category","label":"Nhóm lỗi dịch vụ","description":"Nhóm lỗi ghi nhận ở lượt dịch vụ.","expression":"service_issue_category","data_type":"text","aliases_vi":["nhóm lỗi","loại lỗi"],"allowed_operators":["eq","ne","in"]},
+    {"id":"service_month","label":"Tháng mở lượt dịch vụ","description":"Ngày đầu tháng chứa thời điểm mở lượt dịch vụ.","expression":"date_trunc('month', opened_at)::date","data_type":"date","aliases_vi":["tháng dịch vụ"],"allowed_operators":["eq","gt","gte","lt","lte","in"]}
+  ]
+}

@@ -8,7 +8,7 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
 
-from packages.domain.query_contracts import FilterOperator, Identifier
+from packages.domain.query_contracts import FilterOperator, Identifier, ScalarValue
 
 
 class CatalogStatus(StrEnum):
@@ -78,3 +78,14 @@ class MetricDefinition(BaseModel):
         if any(";" in value or "--" in value or "/*" in value for value in values):
             raise ValueError("catalog filters cannot contain separators/comments")
         return values
+
+
+class GovernedValueDefinition(BaseModel):
+    """Non-sensitive categorical value that may be grounded from user language."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    field: Identifier
+    canonical_value: ScalarValue
+    aliases_vi: list[str] = Field(min_length=1)
+    classification: str = "internal"

@@ -2,9 +2,9 @@
 
 ## 1. Mục đích
 
-Tài liệu mô tả kiến trúc của hệ thống Semantic Text-to-SQL cho dữ liệu chuỗi cung ứng và tồn kho. Hệ thống tiếp nhận câu hỏi bằng ngôn ngữ tự nhiên, chuyển câu hỏi thành kế hoạch truy vấn có ngữ nghĩa, sinh và kiểm tra SQL, thực thi với quyền chỉ đọc, sau đó trả kết quả cùng bằng chứng truy vết.
+Tài liệu mô tả các contract và quality attributes của hệ thống Semantic Text-to-SQL cho dữ liệu khách hàng xe điện, phương tiện, sức khỏe pin, hành vi sạc và lịch sử dịch vụ giả lập. Binding architecture hiện hành là [Wren + Datus](wren-datus-semantic-architecture.md): Wren giữ semantic authority, Datus điều phối workflow/context/memory và mọi execution đi qua typed semantic plan cùng deterministic controls.
 
-Vertical slice đầu tiên là supplier delivery performance; inventory status là lát cắt mở rộng kế tiếp. Kiến trúc vẫn giữ ranh giới module tổng quát nhưng không giả định phải hỗ trợ nhiều domain trong MVP.
+Week 1/B0 bao phủ một lát cắt nhỏ nhưng đa miền gồm Customer360, Vehicle360, battery health, charging station/session và service history. Telemetry/trip/range-estimation trong hai tài liệu ViTAI là north star sau MVP, không phải chức năng đã có.
 
 Tài liệu này xác định ranh giới hệ thống, trách nhiệm của các thành phần, hợp đồng trao đổi dữ liệu và các thuộc tính chất lượng cần được bảo vệ trong quá trình phát triển.
 
@@ -69,6 +69,14 @@ Kết quả phải gắn với các artifact đã dùng để tạo ra nó. Evid
 ### Versioned contracts
 
 API schema, workflow state, metric, prompt, SQL policy và evaluation dataset đều có phiên bản. Thay đổi không tương thích phải có migration hoặc version mới.
+
+### Một semantic authority
+
+Wren MDL/Engine là nguồn metric, dimension, relationship và physical access plan mục tiêu. Datus không duy trì lại KPI trong Dosi cho cùng domain; nó truy cập semantic context qua custom adapter. Catalog/compiler cục bộ chỉ là baseline Week 1 và contract fixture cho tới khi Wren adapter đạt parity.
+
+### Hai paper trong kiến trúc
+
+Semantic-Layer-Mediated Agent định hình backbone bắt buộc qua semantic layer. DAIL-SQL được áp dụng dưới dạng Semantic-DAIL để chọn example theo question skeleton và semantic-plan skeleton; không dùng direct SQL generation để vượt Wren/compiler.
 
 ## 5. System context
 
@@ -136,13 +144,13 @@ Dependency giữa module phải hướng qua public interface. Domain không ph�
 
 ```mermaid
 flowchart TD
-    A[Request validation] --> B[Intent and answerability]
-    B --> C{Đủ thông tin?}
+    A[Normalize request] --> B[Answerability and ambiguity gate]
+    B --> C{Đủ thông tin và đúng scope?}
     C -->|Không| D[Clarification or unanswerable]
-    C -->|Có| E[Semantic retrieval]
-    E --> F[Query planning]
-    F --> G[SQL generation]
-    G --> H[SQL and policy validation]
+    C -->|Có| E[Datus orchestration]
+    E --> F[Wren MDL + memory + value retrieval]
+    F --> G[Semantic-DAIL + typed plan]
+    G --> H[Plan validation + Wren compile/dry plan]
     H -->|Rejected| I[Safe failure]
     H -->|Approved| J[Read-only execution]
     J -->|Repairable error| K{Còn repair budget?}
@@ -385,7 +393,7 @@ Danh sách và trạng thái được quản lý trong `docs/decisions/`.
 
 ## 23. Open questions
 
-- Persona chính và ranh giới chi tiết của vertical slice supplier delivery là gì?
+- Persona chính và ranh giới chi tiết của vertical slice EV charging là gì?
 - Nguồn dữ liệu, owner và classification cụ thể ra sao?
 - Metric nào được phê duyệt cho MVP?
 - Database và SQL dialect nào là target?

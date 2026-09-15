@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ViTAI Data Platform — Bản đồ kiến trúc</title>
+<style>
+:root{
+  --bg:#0f1117; --bg2:#161922; --bg3:#1e222e; --line:#2a2f3d;
+  --tx:#e6e8ee; --tx2:#9aa1b2; --tx3:#6b7285;
+  --p0:#f0616d; --p1:#e0a03c; --p2:#4fb286;
+  --l1:#7c9cf5; --l2:#c084d8; --l3:#4fb0c9; --l4:#e08a5c; --l5:#8b93a8;
+  --acc:#7c9cf5;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#fbfbfd; --bg2:#ffffff; --bg3:#f2f3f7; --line:#e2e5ec;
+    --tx:#1a1d26; --tx2:#5a6172; --tx3:#8b92a3;
+    --p0:#d13a48; --p1:#b57518; --p2:#2e8b62;
+    --l1:#4a6fd4; --l2:#9556b5; --l3:#2a8ba5; --l4:#c06432; --l5:#6b7285;
+    --acc:#4a6fd4;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--tx);
+  font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Inter",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; padding:0 0 80px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+header{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:26px}
+h1{font-size:27px;font-weight:650;letter-spacing:-.02em;margin-bottom:7px}
+.sub{color:var(--tx2);font-size:14.5px;max-width:640px}
+.meta{color:var(--tx3);font-size:12.5px;margin-top:12px}
+
+nav{display:flex;gap:3px;margin-bottom:26px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+nav button{
+  background:none;border:none;color:var(--tx2);font:inherit;font-size:14px;
+  padding:10px 15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .15s,border-color .15s;
+}
+nav button:hover{color:var(--tx)}
+nav button.on{color:var(--acc);border-bottom-color:var(--acc);font-weight:550}
+.panel{display:none}
+.panel.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.legend{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-bottom:22px;font-size:13px;color:var(--tx2)}
+.pri{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid var(--line);transition:background .15s}
+.pri:hover{background:var(--bg3)}
+.pri.off{opacity:.35}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d0{background:var(--p0)}.d1{background:var(--p1)}.d2{background:var(--p2)}
+
+.layer{background:var(--bg2);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.lhead{padding:14px 18px;border-left:3px solid var(--lc);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:var(--bg3)}
+.lnum{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--lc)}
+.lname{font-size:15.5px;font-weight:600}
+.lprob{font-size:13px;color:var(--tx2);margin-left:auto}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px;padding:14px 18px 18px}
+.card{
+  background:var(--bg3);border:1px solid var(--line);border-radius:9px;padding:12px 13px;
+  cursor:pointer;transition:border-color .15s,transform .12s;position:relative;
+}
+.card:hover{border-color:var(--acc);transform:translateY(-1px)}
+.card.hide{display:none}
+.cname{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.cdesc{font-size:12.5px;color:var(--tx2);line-height:1.5}
+.tag{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;letter-spacing:.04em;margin-left:auto}
+.t0{background:color-mix(in srgb,var(--p0) 16%,transparent);color:var(--p0)}
+.t1{background:color-mix(in srgb,var(--p1) 16%,transparent);color:var(--p1)}
+.t2{background:color-mix(in srgb,var(--p2) 16%,transparent);color:var(--p2)}
+
+.prod{background:var(--bg2);border:1px dashed var(--line);border-radius:12px;padding:16px 18px;margin-top:16px}
+.ptitle{font-size:12px;font-weight:700;letter-spacing:.09em;color:var(--tx3);margin-bottom:11px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px}
+.pitem{background:var(--bg3);border-radius:8px;padding:11px 13px}
+.pitem b{font-size:14px;display:block;margin-bottom:3px}
+.pitem span{font-size:12.5px;color:var(--tx2)}
+
+/* modal */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:22px;z-index:50;backdrop-filter:blur(3px)}
+.ov.on{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--line);border-radius:14px;max-width:660px;width:100%;max-height:86vh;overflow-y:auto;padding:26px 28px;position:relative}
+.mtop{display:flex;align-items:center;gap:10px;margin-bottom:5px;padding-right:38px}
+.mtop h3{font-size:20px;font-weight:650}
+.mlayer{font-size:12px;color:var(--tx3);margin-bottom:19px}
+.sec{margin-bottom:17px}
+.sec h4{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--tx3);margin-bottom:6px}
+.sec p{font-size:14px;color:var(--tx);line-height:1.65}
+.sec.trap p{color:var(--p0)}
+.sec.ml p{border-left:2px solid var(--acc);padding-left:11px;color:var(--tx2);font-style:italic}
+.close{position:absolute;top:20px;right:20px;background:var(--bg3);border:1px solid var(--line);color:var(--tx2);
+  width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:16px;line-height:1;z-index:2}
+.close:hover{color:var(--tx)}
+
+/* flow */
+.flow{border-left:2px solid var(--line);margin-left:12px;padding-left:0}
+.step{position:relative;padding:0 0 22px 26px}
+.step::before{content:'';position:absolute;left:-6px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--sc,var(--acc));border:2px solid var(--bg)}
+.stime{font-size:11.5px;font-weight:700;color:var(--sc,var(--acc));letter-spacing:.03em;font-variant-numeric:tabular-nums}
+.stitle{font-weight:600;font-size:14.5px;margin:2px 0 4px}
+.sbody{font-size:13.5px;color:var(--tx2);line-height:1.6}
+.sbody code{background:var(--bg3);padding:1px 5px;border-radius:4px;font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+th{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);color:var(--tx3);font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:hover td{background:var(--bg3)}
+td.lab{font-weight:700;color:var(--acc);white-space:nowrap;font-variant-numeric:tabular-nums}
+.key{color:var(--p0);font-weight:600}
+
+.note{background:var(--bg3);border-left:3px solid var(--acc);border-radius:0 8px 8px 0;padding:13px 16px;font-size:13.5px;color:var(--tx2);margin:18px 0}
+.note b{color:var(--tx)}
+h2{font-size:18px;font-weight:620;margin:26px 0 12px;letter-spacing:-.01em}
+h2:first-child{margin-top:0}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:9px}
+.gitem{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
+.gitem b{font-size:13.5px;display:block;margin-bottom:2px}
+.gitem span{font-size:12.5px;color:var(--tx2)}
+footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--line);color:var(--tx3);font-size:12px}
+@media(max-width:640px){
+  .cards{grid-template-columns:1fr}
+  .lprob{margin-left:0;flex-basis:100%}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>ViTAI Data Platform — Bản đồ kiến trúc</h1>
+  <p class="sub">20 công nghệ, 5 tầng, 1 luồng dữ liệu. Tài liệu tra cứu cho người mạnh ML đang onboard vào Data Engineering.</p>
+  <p class="meta">Bấm vào từng công nghệ để xem: bài toán · cơ chế · neo vào ML · cái bẫy</p>
+</header>
+
+<nav>
+  <button class="on" data-p="arch">Kiến trúc</button>
+  <button data-p="flow">Luồng một event</button>
+  <button data-p="labs">18 Labs</button>
+  <button data-p="gloss">Thuật ngữ</button>
+</nav>
+
+<!-- ARCH -->
+<div class="panel on" id="arch">
+  <div class="legend">
+    <span>Ưu tiên học:</span>
+    <span class="pri" data-f="0"><span class="dot d0"></span>P0 — 2 tuần đầu</span>
+    <span class="pri" data-f="1"><span class="dot d1"></span>P1 — tháng đầu</span>
+    <span class="pri" data-f="2"><span class="dot d2"></span>P2 — hiểu khái niệm</span>
+  </div>
+  <div id="layers"></div>
+
+  <div class="prod">
+    <div class="ptitle">DATA PRODUCTS — thứ các team khác thực sự dùng</div>
+    <div class="pgrid">
+      <div class="pitem"><b>Vehicle360</b><span>Sức khỏe pin, lịch sử lỗi, bảo dưỡng, hiệu suất</span></div>
+      <div class="pitem"><b>Customer360</b><span>Sở hữu, thói quen sạc, tương tác dịch vụ</span></div>
+      <div class="pitem"><b>Mobility360</b><span>Mô hình di chuyển, nhu cầu hạ tầng sạc</span></div>
+      <div class="pitem"><b>AI Memory</b><span>Ngữ cảnh, ký ức, sở thích cho ViTA &amp; agent</span></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Đọc bản đồ này thế nào.</b> Kiến trúc phức tạp không phải vì kỹ sư thích phức tạp, mà vì <b>6 bên tiêu thụ cùng một event với 6 yêu cầu mâu thuẫn nhau</b> — dashboard cần vài giây, cảnh báo pin cần dưới 1 giây, model serving cần dưới 50 ms, data science cần đọc lại 2 năm lịch sử. Không hệ nào phục vụ tốt cả 6. Mỗi công nghệ ở trên là câu trả lời cho một ô trong bảng đó.
+  </div>
+</div>
+
+<!-- FLOW -->
+<div class="panel" id="flow">
+  <h2>Từ bánh xe đến dashboard</h2>
+  <p class="sub" style="margin-bottom:22px">Nếu bạn kể lại được đoạn này bằng lời của mình, bạn đã nắm kiến trúc.</p>
+  <div class="flow" id="flowsteps"></div>
+  <div class="note">
+    <b>Ba điều cần chú ý.</b>
+    <b>1.</b> Cùng một event đi <b>hai đường</b> — đường nóng (giây, realtime) và đường lạnh (giờ, phân tích + train). Hai đường phải cho ra cùng định nghĩa feature, nếu không sẽ có <b>training-serving skew</b>.
+    <b>2.</b> <b>Bronze không bao giờ bị sửa.</b> Mọi lỗi tầng dưới đều sửa được bằng cách chạy lại từ Bronze — đó là lưới an toàn của bạn.
+    <b>3.</b> <b>Data Quality Gate đứng chắn trước Gold.</b> Không có nó, dữ liệu sai lan ra 15 team trước khi ai kịp nhận ra.
+  </div>
+</div>
+
+<!-- LABS -->
+<div class="panel" id="labs">
+  <h2>18 Labs ↔ công nghệ thật đằng sau</h2>
+  <div class="note" style="margin-top:0">
+    <b>18 labs được thiết kế rất tốt.</b> Chúng không dạy công cụ, chúng dạy <b>bài toán mà công cụ giải quyết</b>. Ai làm được cả 18 lab bằng pandas + Python thuần sẽ học Spark/Airflow/Feast trong vài ngày. Ngược lại thì không.
+  </div>
+  <table><thead><tr><th>Lab</th><th>Nội dung</th><th>Công nghệ / khái niệm thật</th></tr></thead><tbody id="labrows"></tbody></table>
+
+  <h2>Lộ trình 4 tuần — full-time 6–8h/ngày</h2>
+  <table><thead><tr><th>Tuần</th><th>Labs</th><th>Mục tiêu nắm được</th></tr></thead><tbody>
+    <tr><td class="lab">1</td><td>Lab 1–5 + dựng Kafka bằng Docker</td><td>medallion · <span class="key">idempotency</span> · at-least-once · quarantine</td></tr>
+    <tr><td class="lab">2</td><td>Lab 6–11 + PySpark local</td><td><span class="key">point-in-time correctness</span> · temporal leakage · as-of join</td></tr>
+    <tr><td class="lab">3</td><td>Lab 12–16 + dựng Airflow</td><td>orchestration · <span class="key">backfill</span> · data_interval · DQ gate</td></tr>
+    <tr><td class="lab">4</td><td>Lab 17–18 + Capstone</td><td><span class="key">training-serving skew</span> · phân loại dữ liệu nhạy cảm</td></tr>
+  </tbody></table>
+
+  <h2>Cái gì KHÔNG cần học ngay</h2>
+  <div class="note" style="border-left-color:var(--p2)">
+    Chủ động bỏ qua trong tháng đầu: <b>WebRTC · LiveKit · Knowledge Graph sâu · Kubernetes sâu · gRPC/MQTT chi tiết · tối ưu Spark nâng cao</b>.<br><br>
+    Danh sách 20 công nghệ trông đáng sợ. Thực tế tháng đầu bạn chỉ cần <b>6</b>: S3, Kafka (khái niệm), Spark, Airflow, medallion architecture, và tư duy Feature Store.
+  </div>
+
+  <h2>Ba câu tự kiểm tra trước khi vào Lab 1</h2>
+  <table><thead><tr><th>#</th><th>Câu hỏi</th><th>Gợi ý</th></tr></thead><tbody>
+    <tr><td class="lab">1</td><td>Vì sao không ghi telemetry thẳng vào database, mà phải qua Kafka → S3 → ClickHouse?</td><td>6 bên tiêu thụ, 6 yêu cầu mâu thuẫn</td></tr>
+    <tr><td class="lab">2</td><td>Model dự đoán quãng đường đạt MAE 0.5 km trên test. Vì sao đây là <b>tin xấu</b>?</td><td>leakage — feature nhìn thấy tương lai, hoặc split ngẫu nhiên trên time-series</td></tr>
+    <tr><td class="lab">3</td><td>Pipeline xanh, Spark không lỗi, nhưng dashboard hiện 0 xe. Chuyện gì xảy ra, cái gì lẽ ra phải chặn được?</td><td>nguồn gửi 0 row · thiếu DQ Gate</td></tr>
+  </tbody></table>
+</div>
+
+<!-- GLOSS -->
+<div class="panel" id="gloss">
+  <h2>Thuật ngữ nghe trong standup</h2>
+  <div class="gloss" id="glossitems"></div>
+  <h2>Chọn công cụ nào cho việc gì</h2>
+  <table><thead><tr><th>Cần làm</th><th>Dùng</th><th>Không dùng</th></tr></thead><tbody id="pickrows"></tbody></table>
+</div>
+
+<footer>
+  Tài liệu onboard nội bộ · 14/08/2026 · Các con số quy mô là ví dụ minh họa để cảm nhận độ lớn, không phải số liệu production của VinFast.
+</footer>
+</div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+
+<script>
+const LAYERS=[
+ {n:"TẦNG 1",name:"Edge & Transport",c:"var(--l1)",prob:"Mạng 4G chập chờn, xe di động, băng thông đắt",
+  techs:[
+   {name:"MQTT",p:2,short:"Giao thức pub/sub siêu nhẹ cho IoT",
+    prob:"Xe chạy trên đường, sóng 4G lúc có lúc mất. HTTP mở kết nối mới mỗi request → handshake TLS tốn ~5 gói tin, tốn pin, tốn data. Với xe gửi mỗi giây thì không chịu nổi.",
+    mech:"Giữ MỘT kết nối TCP dài thay vì mở đi mở lại. Header nhỏ nhất chỉ 2 byte (HTTP thường 200–800 byte). QoS 0/1/2 chọn mức đảm bảo. Last Will and Testament: xe mất kết nối đột ngột → broker tự phát message 'xe này offline'.",
+    ml:"Như DataLoader chạy trên thiết bị yếu, mạng tệ: tối ưu để KHÔNG CHẾT, chứ không phải để nhanh nhất.",
+    trap:"QoS 1 cho phép DUPLICATE — cùng một event có thể vào hệ thống 2 lần. Đây chính là lý do Lab 3 bắt bạn làm idempotency. Không phải bài tập lý thuyết, mà là hậu quả trực tiếp."},
+   {name:"gRPC",p:2,short:"RPC nhị phân, contract compile được",
+    prob:"REST + JSON tốn băng thông và tốn CPU parse. Với giao tiếp máy-với-máy tần suất cao, overhead tích lại rất lớn.",
+    mech:"Protobuf nhị phân thay JSON text: {\"speed\":62.4} từ ~30 byte xuống ~5 byte. Chạy trên HTTP/2 nên multiplex được. Streaming 2 chiều native. Mấu chốt: file .proto là contract CÓ THỂ COMPILE — viết schema một lần, sinh client Python, server Go, client C++ trên xe, cả ba không thể lệch nhau.",
+    ml:"Như type hints + Pydantic schema, nhưng bắt buộc và cross-language.",
+    trap:"Binary → không curl để debug được. Cần tool riêng (grpcurl)."},
+   {name:"WebRTC",p:2,short:"Media realtime peer-to-peer",
+    prob:"Truyền audio/video thời gian thực với độ trễ dưới 300 ms — trợ lý giọng nói ViTA trên xe, hoặc remote assistance nhìn qua camera.",
+    mech:"Chuẩn peer-to-peer dùng UDP, chấp nhận MẤT GÓI để giữ độ trễ thấp — ngược hoàn toàn với triết lý của Kafka.",
+    ml:"Không liên quan tới ML pipeline của bạn. Biết nó tồn tại là đủ.",
+    trap:"Điểm cần nhớ duy nhất: Telemetry (số liệu xe) → MQTT/Kafka, tin cậy có thứ tự lưu lâu dài. Media (giọng nói/video) → WebRTC/LiveKit, độ trễ thấp chấp nhận mất gói KHÔNG lưu. Nhầm hai luồng này là lỗi kiến trúc nghiêm trọng."},
+   {name:"LiveKit",p:2,short:"Hạ tầng dựng sẵn trên WebRTC",
+    prob:"WebRTC thuần rất khó vận hành ở quy mô lớn: NAT traversal, scale, quản lý room.",
+    mech:"Quản lý room, participant, và server SFU để scale. Tài liệu dự án đã ghi rõ: 'LiveKit không phải Data Platform'.",
+    ml:"Khác lĩnh vực. Sẽ học khi có task cụ thể.",
+    trap:"Đây là công nghệ ít liên quan nhất tới công việc của bạn. Đừng dành thời gian cho nó trong tháng đầu."}]},
+
+ {n:"TẦNG 2",name:"Event Backbone",c:"var(--l2)",prob:"1 event → N hệ thống, mỗi hệ thống một tốc độ",
+  techs:[
+   {name:"Kafka",p:0,short:"Log bất biến, tua lại được — trung tâm của tầng 2",
+    prob:"Bạn có 1 luồng event từ xe, 6 hệ thống muốn dùng. Nếu producer gọi thẳng 6 hệ thống: thêm consumer mới = sửa code producer; 1 hệ thống chậm = nghẽn cả xe; 1 hệ thống chết = mất data vĩnh viễn.",
+    mech:"Kafka chèn vào giữa như cuốn sổ ghi chép bất biến, có thể tua lại. (a) LOG chứ không phải hàng đợi — message không bị xóa sau khi đọc, nằm đó theo retention; consumer chỉ giữ con trỏ gọi là OFFSET. Hệ quả cực mạnh: thêm consumer hôm nay, cho đọc từ offset 0 → replay toàn bộ 30 ngày lịch sử. (b) PARTITION = đơn vị song song, muốn nhanh gấp 10 → 10 partition. (c) PARTITION KEY quyết định thứ tự — thứ tự CHỈ được đảm bảo trong một partition. (d) CONSUMER GROUP tự cân bằng lại khi một instance chết.",
+    ml:"Như một DataLoader mà nhiều model train cùng lúc đọc chung một dataset, mỗi model đọc với tốc độ riêng, và bạn có thể seek(0) để train lại từ đầu bất cứ lúc nào.",
+    trap:"Với telemetry xe, LUÔN dùng VIN làm partition key — không set key thì event cùng xe xử lý sai thứ tự, SOC nhảy loạn. Commit offset TRƯỚC khi xử lý xong → crash → mất message vĩnh viễn. Commit SAU nhưng không idempotent → crash → xử lý trùng. Kafka mặc định là AT-LEAST-ONCE: bạn phải tự lo chuyện trùng lặp."}]},
+
+ {n:"TẦNG 3",name:"Storage & Processing",c:"var(--l3)",prob:"Biến 8.6 TB/ngày rác thành bảng sạch, query được",
+  techs:[
+   {name:"S3",p:0,short:"Object storage — nền của Data Lake",
+    prob:"Cần chỗ lưu petabyte, rẻ, không mất, không cần biết trước schema.",
+    mech:"Object storage, KHÔNG phải filesystem. Không có thư mục thật — dấu / chỉ là ký tự trong tên, nên 'liệt kê thư mục' thực ra là quét prefix và rất chậm khi có hàng triệu object. Không sửa file tại chỗ, chỉ ghi đè cả object.",
+    ml:"Như thư mục dataset trên ổ cứng, nhưng vô hạn, không sửa được file, và list thư mục tốn tiền lẫn thời gian.",
+    trap:"STORAGE CLASS sẽ cắn bạn: ai đó bảo 'lấy data tháng 3/2025 để test'. Spark fail với InvalidObjectState vì data ở Deep Archive, cần RESTORE TRƯỚC và chờ tới 48 GIỜ. Không phải bug. PARTITION đúng cách: date=2026-08-01/hour=08/ ✅ — vin=VF8_0001/ ❌ (100,000 thư mục, list rất chậm). Nguyên tắc: partition theo cột hay lọc nhất và ít giá trị."},
+   {name:"Iceberg / Delta",p:1,short:"Git cho bảng dữ liệu",
+    prob:"Data Lake thuần S3+Parquet có 5 điểm đau: không transaction (Spark chết giữa chừng → người khác đọc dữ liệu nửa vời); không xóa/sửa row (GDPR); không time travel; schema đổi là vỡ; list 10 triệu file mất vài phút trước khi đọc byte đầu tiên.",
+    mech:"Một lớp METADATA đặt trên các file Parquet, ghi lại: bảng gồm file nào, mỗi file chứa khoảng giá trị nào, snapshot nào tại thời điểm nào. Vì 'trạng thái bảng' chỉ là MỘT CON TRỎ tới file metadata, commit trở thành atomic: đổi con trỏ = xong, hoặc không đổi = như chưa có gì.",
+    ml:"Iceberg là GIT CHO BẢNG DỮ LIỆU. Snapshot = commit. Time travel = git checkout <sha>. Schema evolution = đổi cấu trúc mà lịch sử không vỡ.",
+    trap:"Vì sao quan trọng với AI: SELECT * FROM telemetry_gold FOR TIMESTAMP AS OF '2026-08-01' — train lại trên đúng trạng thái dữ liệu tháng trước. Không có time travel → KHÔNG THỂ tái lập kết quả train, vì bảng nguồn đã bị backfill 3 lần. Với ML, reproducibility là bắt buộc. (2026: Iceberg đã có spec v3 với deletion vectors, GA trên các engine lớn.)"},
+   {name:"Spark",p:0,short:"Xử lý phân tán khi pandas hết RAM",
+    prob:"pd.read_parquet() một thư mục 8 TB → máy bạn chết.",
+    mech:"Chia dữ liệu thành partition, phát cho N máy, gom kết quả. Ba điều phải hiểu: (a) LAZY — filter/groupBy không chạy gì cả, chỉ dựng kế hoạch; chỉ khi gọi ACTION (.count/.write/.collect/.show) Spark mới tối ưu toàn bộ rồi chạy, nhờ đó đẩy filter xuống tận lúc đọc file. (b) SHUFFLE LÀ KẺ THÙ — groupBy/join/distinct/orderBy đều ghi đĩa, truyền mạng, đọc lại; đây là 90% nguyên nhân job chậm. (c) DATA SKEW — một VIN chiếm 30% dữ liệu (xe test chạy 24/7) → 1 task làm 30% việc, job chạy 4 tiếng thay vì 10 phút, thêm máy KHÔNG giúp gì.",
+    ml:"df[df.speed>60] → df.filter(...) nhưng chưa chạy. df.groupby() → df.groupBy() nhưng gây shuffle. df.head() → df.show() là action. Nếu bạn từng dùng Dask hoặc lazy transform trong DataLoader, bạn đã có mô hình tư duy đúng.",
+    trap:".collect() kéo TOÀN BỘ dữ liệu về driver node. Gọi trên bảng 8 TB → driver chết ngay. Dùng .limit(100).collect() hoặc .show(). Mẹo học: đọc Spark UI tab Stages — nó cho thấy shuffle và skew rõ ràng bằng mắt, giá trị hơn học 50 hàm API."},
+   {name:"Airflow",p:0,short:"Nhạc trưởng: điều phối, retry, backfill",
+    prob:"12 job phụ thuộc nhau. Chạy tay bằng cron thì: job 3 fail nhưng 4–8 vẫn chạy trên data rác; không biết job nào đang chạy; muốn chạy lại ngày 3/8 phải sửa tay; không retry, không alert.",
+    mech:"Mô tả workflow bằng Python thành DAG. Airflow lo thứ tự, retry, timeout, alert, lịch chạy, và BACKFILL. Khái niệm quan trọng nhất là data_interval (trước gọi execution_date): mỗi lần chạy gắn với MỘT KHOẢNG THỜI GIAN DỮ LIỆU, không phải thời điểm hiện tại. DAG chạy 02:00 ngày 14/8 với data_interval = 13/8 nghĩa là xử lý dữ liệu ngày 13/8. Đây là điều khiến backfill khả thi.",
+    ml:"Như make, hoặc một DAG các sklearn.Pipeline steps, nhưng có lịch chạy, retry, và lịch sử chạy đầy đủ.",
+    trap:"Airflow là NHẠC TRƯỞNG, KHÔNG PHẢI NHẠC CÔNG — đừng pd.read_csv rồi transform ngay trong task, worker Airflow thường bé; hãy gọi Spark/dbt. Đừng dùng datetime.now() trong task, backfill sẽ sai hết — luôn dùng data_interval_start. Đừng truyền DataFrame qua XCom (chỉ metadata nhỏ). ViTAI dùng MWAA (Airflow do AWS vận hành, 2026 đã hỗ trợ tới 3.2) — kiểm tra bạn đang đọc doc 2.x hay 3.x, nhiều blog cũ vẫn viết theo 2.x."},
+   {name:"dbt",p:1,short:"SQL có version, có test, có lineage",
+    prob:"Sau khi Spark làm sạch, bạn có 200 câu SQL rải rác trong notebook, script, và đầu người. Không ai biết bảng vehicle_daily_summary tính từ đâu, và khi công thức đổi thì phải sửa ở 7 chỗ.",
+    mech:"Mỗi phép biến đổi là một file SQL SELECT. Cái {{ ref('stg_telemetry') }} là toàn bộ điều kỳ diệu — từ đó dbt TỰ dựng DAG, biết chạy cái nào trước, và vẽ ra lineage graph. Kèm theo: test khai báo (not_null, unique, accepted_values) viết trong YAML, documentation tự sinh, macro tái sử dụng.",
+    ml:"dbt với SQL giống sklearn.Pipeline với transform: mỗi bước có tên, có thứ tự, có test, và bạn nhìn được toàn bộ chuỗi.",
+    trap:"Ranh giới Spark vs dbt — câu hỏi bạn SẼ được hỏi: Spark làm dữ liệu bẩn, nested JSON, khối lượng khổng lồ, logic phức tạp bằng Python/Scala. dbt làm dữ liệu đã phẳng, biến đổi bằng SQL, logic nghiệp vụ. Thực tế: Spark làm Bronze→Silver, dbt làm Silver→Gold."},
+   {name:"ClickHouse",p:1,short:"OLAP cột, dashboard dưới 1 giây",
+    prob:"Dashboard cần 'tốc độ TB theo giờ, 100,000 xe, 30 ngày' trả về dưới 1 GIÂY, với 200 người cùng mở. Spark trả lời được nhưng mất 3 phút (tối ưu cho thông lượng, không phải độ trễ). Postgres thì chết.",
+    mech:"Columnar: row-oriented lưu từng dòng liền nhau nên query AVG(speed) phải đọc CẢ dòng kể cả 40 cột không cần. Column-oriented lưu từng cột liền nhau nên chỉ chạm đúng dải speed — nhanh gấp 10–100 lần. Thêm nữa cột speed toàn float gần giống nhau → nén cực tốt, thường 10:1 trở lên, ít byte đọc từ đĩa = nhanh hơn nữa.",
+    ml:"Parquet cũng là columnar — bạn đã dùng nguyên lý này rồi. ClickHouse = Parquet + engine query cực nhanh + khả năng nhận ghi liên tục.",
+    trap:"KHÔNG phải database giao dịch. Tệ ở: cập nhật từng row, xóa từng row, join lớn, đọc một row theo khóa chính. Đừng dùng thay Postgres. Vị trí đúng: Gold table (Iceberg/S3) → nạp vào ClickHouse → Grafana query."}]},
+
+ {n:"TẦNG 4",name:"AI / Intelligence",c:"var(--l4)",prob:"Đưa data đến model và đến agent một cách nhất quán — tầng gần bạn nhất",
+  techs:[
+   {name:"Feature Store",p:0,short:"Chống training-serving skew",
+    prob:"Lúc TRAIN: avg_speed_30m tính bằng Spark trên S3, dùng event_time, bao gồm điểm ở phút 30. Lúc SERVE: service Java đọc Kafka, dùng thời gian hệ thống, loại trừ điểm ở phút 30. → MAE 7.8 km thành 14 km. VÀ KHÔNG CÓ ALERT NÀO BẮN. Model không hỏng — INPUT của nó hỏng.",
+    mech:"Định nghĩa feature MỘT LẦN, phục vụ hai đường: OFFLINE STORE (S3/Iceberg, hàng TB → sinh training set, point-in-time correct join) và ONLINE STORE (Redis, độ trễ <10ms → phục vụ inference, chỉ giá trị mới nhất).",
+    ml:"Hạ tầng biến X_train từ 'cái tôi tạo trong notebook' thành 'cái được định nghĩa một lần, dùng lại được, có version, và GIỐNG HỆT cái model thấy lúc production'.",
+    trap:"POINT-IN-TIME JOIN là kỹ thuật quan trọng nhất và khó nhất. ❌ JOIN features ON vin → lấy giá trị hôm nay → leakage. ✅ JOIN ON vin AND feature_time <= t AND feature_time > t - ttl. Gọi là as-of join, bạn sẽ tự viết trong Lab 8/9. Lưu ý: Feature Store chỉ giúp nếu CẢ HAI đường đều đi qua nó — nếu team serving tự tính lại 'cho nhanh', skew quay lại ngay. Đây là vấn đề tổ chức hơn là công cụ."},
+   {name:"Vector Database",p:1,short:"Tìm theo ngữ nghĩa cho AI Memory",
+    prob:"Agent cần nhớ 'chủ xe này từng phàn nàn tiếng kêu cửa sau trái 3 tháng trước'. Không tìm được bằng WHERE description = '...' vì lần này người dùng nói 'cái cửa sau vẫn kêu lọc cọc' — khác từ hoàn toàn, cùng ý nghĩa.",
+    mech:"Nhúng văn bản thành vector, tìm theo KHOẢNG CÁCH NGỮ NGHĨA thay vì khớp từ. Lưu hàng trăm triệu vector, tìm k-láng-giềng-gần-nhất trong vài mili giây bằng chỉ mục ANN (thường HNSW). Công cụ: pgvector, Qdrant, Milvus, Weaviate, Pinecone.",
+    ml:"Bạn đã biết FAISS. Vector DB = FAISS + lưu bền + lọc metadata + cập nhật realtime + multi-tenant + backup.",
+    trap:"Chỗ hầu hết mọi người làm sai: LỌC METADATA KẾT HỢP TÌM VECTOR. Không phải 'tìm 5 kỷ niệm giống nhất trong toàn hệ thống' mà là 'tìm 5 kỷ niệm giống nhất CỦA RIÊNG chủ xe này, trong 6 tháng qua'. Không có filter → agent rò rỉ dữ liệu người dùng khác. Đây là lỗi BẢO MẬT, không chỉ lỗi chất lượng."},
+   {name:"Knowledge Graph",p:2,short:"Suy luận theo quan hệ nhiều bước",
+    prob:"'Lỗi cảm biến này ảnh hưởng dòng xe nào, sản xuất tại nhà máy nào, linh kiện từ nhà cung cấp nào, đã bán cho bao nhiêu khách ở khu vực nào?' — bằng SQL là 6 bảng JOIN, và nếu chuỗi quan hệ dài không xác định trước thì gần như không viết nổi.",
+    mech:"Lưu dữ liệu thành node và cạnh: (Khách hàng)─sở hữu→(Xe VF8)─lắp→(Pack pin #A12)─sản xuất bởi→(Nhà cung cấp X). Rồi duyệt đồ thị: từ nhà cung cấp X đi ngược 3 bước ra tất cả khách hàng bị ảnh hưởng.",
+    ml:"Bù cho Vector DB: Vector DB cho 'gọi lại điều TƯƠNG TỰ' (mờ, ngữ nghĩa), Knowledge Graph cho 'suy ra điều LIÊN QUAN' (chính xác, quan hệ). RAG hiện đại thường dùng cả hai — gọi là GraphRAG.",
+    trap:"Hiểu khái niệm là đủ trong tháng đầu. Đừng đầu tư sâu khi chưa có task."},
+   {name:"Model Registry",p:1,short:"MLflow — model trỏ về đúng dataset version",
+    prob:"Model nào đang chạy production? Train từ dataset version nào, feature version nào, git commit nào? Ai duyệt?",
+    mech:"range_model_v1 → dataset: telemetry_gold_v3 (Iceberg snapshot #8891) · features: range_features_v4 · git_commit: a3f9c21 · metrics: MAE 7.8 km, P90 error 16.4 km · stage: Production.",
+    ml:"Phần bạn đã quen nhất. Sẽ học rất nhanh.",
+    trap:"Mấu chốt: model version phải TRỎ ĐƯỢC VỀ đúng dataset version và feature version. Đó là lý do Iceberg time travel quan trọng — không có nó, 'tái lập kết quả train' là bất khả thi."},
+   {name:"Evaluation Platform",p:1,short:"Đánh giá theo lát cắt, không phải một con số",
+    prob:"Trong nghiên cứu ML bạn báo cáo MAE = 7.8 km. Trong automotive, con số tổng thể gần như VÔ NGHĨA.",
+    mech:"Phân rã theo lát cắt: Tổng thể 7.8 km (có vẻ tốt) · SOC>50% 5.1 km (tốt) · SOC<15% 20.3 km (HỎNG) · Nhiệt độ<15°C 15.7 km · Xe>3 năm 13.2 km · Cao tốc>90km/h 9.4 km.",
+    ml:"Đây là chỗ bạn cần ĐỔI TƯ DUY, và cũng là chỗ bạn có thể đóng góp ngay với thế mạnh ML.",
+    trap:"Model MAE tổng thể 7.8 km này KHÔNG được lên production — nó sai nhất đúng vào lúc người dùng cần nhất (SOC thấp, quyết định có kịp tới trạm sạc không). Model MAE 9 km nhưng ĐỀU trên mọi lát cắt thì tốt hơn. Thêm nữa: sai số BẤT ĐỐI XỨNG — dự đoán thừa 10 km (hết pin giữa đường) tệ hơn nhiều dự đoán thiếu 10 km. Hàm loss nên phản ánh điều đó."},
+   {name:"AI Memory Platform",p:2,short:"Sản phẩm khác biệt ViTAI sẽ sở hữu",
+    prob:"Agent hội thoại không trạng thái thì vô dụng.",
+    mech:"Tầng ghép 4 loại ký ức: Vector DB → ký ức ngữ nghĩa. Knowledge Graph → ký ức quan hệ. Feature Store → ký ức số liệu (thói quen sạc, phong cách lái). Data products → ký ức hồ sơ (Customer360, Vehicle360).",
+    ml:"Không phải công nghệ mua sẵn — tài liệu dự án ghi rõ 'đây là phần ViTAI sẽ sở hữu'.",
+    trap:"Ví dụ đích đến: agent trả lời 'Anh thường sạc ở nhà lúc 11 giờ đêm. Với lịch mai đi Hải Phòng, pin hiện tại đủ, nhưng hôm nay trời 12°C nên em khuyên sạc thêm 15%.' — Câu đó cần CẢ BỐN nguồn cùng lúc. Đó là lý do platform tồn tại."}]},
+
+ {n:"TẦNG 5",name:"Platform & Ops",c:"var(--l5)",prob:"Chạy tất cả những thứ trên mà không cần SSH tay",
+  techs:[
+   {name:"Kubernetes / EKS",p:2,short:"Khai báo trạng thái, hệ tự duy trì",
+    prob:"~40 thứ cần chạy liên tục: Kafka consumer, Spark job, API serving, Airflow worker, feature service. Deploy tay bằng SSH thì không scale, và một máy chết là mọi thứ chết theo.",
+    mech:"Bạn khai báo trạng thái mong muốn, K8s tự duy trì: 'tôi muốn 3 bản range-api, mỗi bản 2 CPU 4GB; bản nào chết thì tạo lại; CPU>70% thì tăng lên 10 bản'. Từ vựng tối thiểu: Pod (đơn vị nhỏ nhất) · Deployment (giữ N pod chạy) · Service (địa chỉ mạng ổn định) · Namespace (data-dev/data-prod) · ConfigMap/Secret · Job/CronJob · EKS (K8s do AWS vận hành control plane).",
+    ml:"Không cần trở thành kỹ sư K8s. Cần đủ để không bị chặn khi debug.",
+    trap:"5 lệnh cứu mạng: kubectl get pods -n data-prod · kubectl logs -f <pod> · kubectl describe pod <pod> · kubectl exec -it <pod> -- bash · kubectl top pods. Riêng DESCRIBE cho biết pod Pending vì thiếu tài nguyên, hay CrashLoopBackOff vì app tự chết, hay ImagePullBackOff vì sai tên image. ViTAI: Airflow (MWAA) submit job vào EKS — mô hình rất phổ biến, Airflow điều phối, K8s thực thi."},
+   {name:"Prometheus + Grafana",p:2,short:"Giám sát hệ thống ≠ giám sát dữ liệu",
+    prob:"Pipeline chạy 'thành công' nhưng dữ liệu sai. Bạn phát hiện sau 3 ngày, khi người dùng phàn nàn.",
+    mech:"Prometheus: time-series DB, CHỦ ĐỘNG đi scrape metric từ service mỗi 15 giây, query bằng PromQL. Grafana: vẽ dashboard. Alertmanager: điều kiện PromQL vi phạm → gửi cảnh báo.",
+    ml:"Metric bạn sẽ nhìn hằng ngày: Kafka consumer lag — consumer chậm hơn producer bao nhiêu message. Lag tăng đều = hệ thống không theo kịp = sắp có sự cố.",
+    trap:"PHÂN BIỆT HAI LOẠI GIÁM SÁT. System monitoring (Prometheus lo): CPU/RAM/disk, Spark job xong chưa, consumer lag, API p99 → 'Hệ thống có SỐNG không?'. Data quality monitoring (BẠN lo): tỉ lệ SOC hợp lệ, tỉ lệ VIN thiếu, tỉ lệ trùng, độ tươi vs SLA, số xe có dữ liệu hôm nay, feature có trôi không → 'Dữ liệu có ĐÚNG không?'. JOB XANH KHÔNG CÓ NGHĨA LÀ DỮ LIỆU ĐÚNG. Đây là toàn bộ nội dung Lab 16, và là bài học đắt giá nhất của nghề."}]}
+];
+
+const FLOW=[
+ {t:"08:00:10",c:"var(--l1)",title:"Xe VF8_LAB_0001 — BMS đọc tín hiệu",b:"SOC = 71.8%, tốc độ 62.4 km/h. TCU đóng gói, gửi qua MQTT (QoS 1) trên 4G."},
+ {t:"08:00:11",c:"var(--l2)",title:"MQTT Broker → Kafka",b:"Bridge chuyển sang Kafka với <code>key = VIN</code> — để mọi event của xe này vào cùng partition, giữ đúng thứ tự. Topic <code>vehicle.telemetry</code>, partition 7, offset 9,812,001."},
+ {t:"< 1 giây",c:"var(--l4)",title:"Đường nóng — cảnh báo realtime",b:"SOC bình thường, không làm gì. Nếu SOC tụt bất thường hoặc nhiệt độ pack vượt ngưỡng → cảnh báo ngay."},
+ {t:"< 2 giây",c:"var(--l4)",title:"Đường nóng — feature service",b:"Cập nhật <code>avg_speed_5m</code> vào Redis (Online Store), sẵn sàng cho inference dưới 50 ms."},
+ {t:"08:05:00",c:"var(--l3)",title:"Kafka Connect → Bronze trên S3",b:"Gom 5 phút, ghi Parquet: <code>s3://lake/bronze/telemetry/date=2026-08-01/hour=08/part-0093.parquet</code>. Bronze giữ NGUYÊN VẸN payload, chỉ thêm ingestion_time, source, schema_version. Không clean gì ở đây."},
+ {t:"02:00 hôm sau",c:"var(--l3)",title:"⏰ Airflow DAG kích hoạt",b:"<code>data_interval = 2026-08-01</code> — xử lý dữ liệu của NGÀY HÔM QUA, không phải hôm nay. Đây là điều khiến backfill khả thi."},
+ {t:"→",c:"var(--l3)",title:"Spark: Bronze → Silver",b:"Validate. SOC 71.8 hợp lệ → Silver. Nếu SOC = 125 → KHÔNG XÓA, đẩy vào bảng <code>quarantine</code> kèm lý do. Tuần sau sẽ có người hỏi 'tại sao xe VF8-1234 biến mất khỏi báo cáo?'"},
+ {t:"→",c:"var(--l3)",title:"Spark: Sessionization",b:"Gộp các event rời rạc thành chuyến đi: <code>trip_id = T_88213</code>. Edge case nhiều hơn bạn tưởng — ignition missing, mất mạng giữa chuyến, trip > 24h."},
+ {t:"→",c:"var(--l3)",title:"dbt: Silver → Gold",b:"Áp logic nghiệp vụ bằng SQL, chạy test khai báo, sinh lineage graph tự động."},
+ {t:"→",c:"var(--l4)",title:"Feature job → Offline Store",b:"Tính <code>avg_speed_30m</code>, <code>soc_drop_30m</code>, <code>battery_power_kw</code> → ghi Offline Store (Iceberg trên S3). Định nghĩa PHẢI giống hệt đường nóng ở trên."},
+ {t:"🚦 GATE",c:"var(--p0)",title:"Data Quality Gate — chốt chặn",b:"SOC hợp lệ 99.94% ✓ · VIN đầy đủ 99.97% ✓ · trùng lặp 0.03% ✓ → PASS, cho publish Gold.<br><b>Nếu FAIL → DỪNG, không publish, alert.</b> Spark chạy xong không crash chỉ chứng minh CODE không lỗi, không chứng minh DỮ LIỆU đúng."},
+ {t:"→",c:"var(--l3)",title:"Gold → ClickHouse → Grafana",b:"Nạp vào ClickHouse, dashboard vận hành sáng đèn, trả lời truy vấn dưới 1 giây cho 200 người dùng đồng thời."},
+ {t:"→",c:"var(--l4)",title:"Training job → MLflow",b:"Đọc Gold qua <b>point-in-time join</b> → XGBoost → MLflow: <code>range_model_v2</code>, MAE 7.6 km.<br>Đánh giá theo lát cắt: SOC&lt;15% MAE 19.8 km → <b>⚠ chưa cho lên production.</b>"}
+];
+
+const LABS=[
+ [1,"Signal discovery, 3,000 → 80 signal","Data contract, ưu tiên hóa — kỹ năng nói KHÔNG"],
+ [2,"Generator + cố tình inject lỗi","MQTT/Kafka semantics: trùng, đến muộn, sai thứ tự"],
+ [3,"Raw → Bronze, <span class='key'>idempotency</span>","Kafka at-least-once · medallion · partition S3"],
+ [4,"EDA / Data Profiling","Tiền đề của Great Expectations"],
+ [5,"Cleaning + <span class='key'>quarantine</span>","Spark · data quality · điền theo ngữ nghĩa signal"],
+ [6,"Canonical mapping YAML","Schema evolution — chống vỡ downstream"],
+ [7,"Sessionization → trip","Stateful stream processing"],
+ [8,"Feature engineering","Feature Store (offline) · rolling · lag"],
+ [9,"Label + <span class='key'>leakage exercise</span>","Point-in-time correctness"],
+ [10,"Feature selection 320 → 80","Feature Registry · lineage · ablation"],
+ [11,"Time-based split","Temporal + entity generalization"],
+ [12,"Baseline → XGBoost","<span class='key'>Đánh giá theo lát cắt</span>"],
+ [13,"Pipeline fit/transform","sklearn / Spark ML — không fit lại trên test"],
+ [14,"MLflow","Model Registry"],
+ [15,"Notebook → DAG","<span class='key'>Airflow</span> · backfill · data_interval"],
+ [16,"Data Quality Gate","Great Expectations · Prometheus"],
+ [17,"Batch ↔ realtime parity","<span class='key'>Feature Store · training-serving skew</span>"],
+ [18,"Governance","Phân loại dữ liệu · tokenize VIN · geohash GPS"]
+];
+
+const GLOSS=[
+ ["Backfill","chạy lại pipeline cho khoảng thời gian trong quá khứ"],
+ ["Idempotent","chạy N lần = chạy 1 lần"],
+ ["Consumer lag","consumer chậm hơn producer bao nhiêu message"],
+ ["Data skew","dữ liệu phân bố lệch → 1 task làm hết việc"],
+ ["Shuffle","Spark chuyển dữ liệu qua mạng giữa các node — tốn kém"],
+ ["Medallion","kiến trúc Bronze → Silver → Gold"],
+ ["Upstream / Downstream","nguồn cấp cho tôi / bên tiêu thụ của tôi"],
+ ["SLA / Freshness","dữ liệu phải sẵn sàng trước mấy giờ / cũ tối đa bao lâu"],
+ ["Watermark","ngưỡng thời gian sau đó ngừng chờ data đến muộn"],
+ ["Cardinality","số giá trị khác nhau của một cột"],
+ ["Point-in-time","trạng thái dữ liệu đúng tại một thời điểm quá khứ"],
+ ["DQ Gate","chốt chặn chất lượng — fail thì không publish"],
+ ["Data contract","thỏa thuận schema + chất lượng giữa bên cấp và bên dùng"],
+ ["Quarantine","nơi chứa record bị loại, kèm lý do"],
+ ["Event time vs Processing time","lúc việc xảy ra vs lúc hệ thống nhận được"],
+ ["Training-serving skew","feature lúc train khác lúc serve → model degrade âm thầm"]
+];
+
+const PICK=[
+ ["Nhận event từ hàng trăm nghìn xe","Kafka","REST API, Postgres"],
+ ["Lưu petabyte rẻ, lâu dài","S3","HDFS, database"],
+ ["Bảng trên S3 có transaction + time travel","Iceberg / Delta","Parquet thuần"],
+ ["Xử lý TB dữ liệu bẩn, nested","Spark","pandas"],
+ ["Logic nghiệp vụ SQL có test + lineage","dbt","script SQL rời rạc"],
+ ["Dashboard trả lời dưới 1 giây","ClickHouse","Spark, Postgres"],
+ ["Điều phối job, retry, backfill","Airflow","cron"],
+ ["Feature nhất quán train ↔ serve","Feature Store","tính lại ở mỗi nơi"],
+ ["Tìm kiếm ngữ nghĩa cho agent","Vector DB","LIKE '%...%'"],
+ ["Truy vấn quan hệ nhiều bước","Knowledge Graph","6 bảng JOIN"],
+ ["Voice / video độ trễ thấp","WebRTC / LiveKit","Kafka"],
+ ["Chạy service, tự phục hồi","Kubernetes","systemd, SSH"],
+ ["Giám sát hệ thống","Prometheus + Grafana","đọc log bằng mắt"],
+ ["Giám sát chất lượng dữ liệu","DQ Gate trong pipeline","Prometheus (nó không biết)"]
+];
+
+// render layers
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+let all=[];
+document.getElementById('layers').innerHTML=LAYERS.map((L,li)=>{
+  const cards=L.techs.map((t,ti)=>{
+    all.push(Object.assign({},t,{layer:L.name,lnum:L.n,lc:L.c}));
+    const i=all.length-1;
+    return `<div class="card" data-i="${i}" data-p="${t.p}">
+      <div class="cname">${t.name}<span class="tag t${t.p}">P${t.p}</span></div>
+      <div class="cdesc">${t.short}</div></div>`;
+  }).join('');
+  return `<div class="layer"><div class="lhead" style="--lc:${L.c}">
+    <span class="lnum">${L.n}</span><span class="lname">${L.name}</span>
+    <span class="lprob">${L.prob}</span></div>
+    <div class="cards">${cards}</div></div>`;
+}).join('');
+
+document.getElementById('flowsteps').innerHTML=FLOW.map(s=>
+ `<div class="step" style="--sc:${s.c}"><div class="stime">${s.t}</div>
+  <div class="stitle">${s.title}</div><div class="sbody">${s.b}</div></div>`).join('');
+
+document.getElementById('labrows').innerHTML=LABS.map(l=>
+ `<tr><td class="lab">Lab ${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td></tr>`).join('');
+
+document.getElementById('glossitems').innerHTML=GLOSS.map(g=>
+ `<div class="gitem"><b>${g[0]}</b><span>${g[1]}</span></div>`).join('');
+
+document.getElementById('pickrows').innerHTML=PICK.map(p=>
+ `<tr><td>${p[0]}</td><td><b>${p[1]}</b></td><td style="color:var(--tx3)">${esc(p[2])}</td></tr>`).join('');
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.getElementById(b.dataset.p).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+// priority filter
+const active=new Set(['0','1','2']);
+document.querySelectorAll('.pri').forEach(p=>p.onclick=()=>{
+  const f=p.dataset.f;
+  if(active.has(f)){active.delete(f);p.classList.add('off')}
+  else{active.add(f);p.classList.remove('off')}
+  if(active.size===0){active.add('0');active.add('1');active.add('2');
+    document.querySelectorAll('.pri').forEach(x=>x.classList.remove('off'))}
+  document.querySelectorAll('.card').forEach(c=>
+    c.classList.toggle('hide',!active.has(c.dataset.p)));
+});
+
+// modal
+const ov=document.getElementById('ov'),modal=document.getElementById('modal');
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.card'); if(!c)return;
+  const t=all[+c.dataset.i];
+  modal.innerHTML=`<button class="close" onclick="document.getElementById('ov').classList.remove('on')">×</button>
+   <div class="mtop"><h3>${t.name}</h3><span class="tag t${t.p}">P${t.p}</span></div>
+   <div class="mlayer" style="color:${t.lc}">${t.lnum} · ${t.layer}</div>
+   <div class="sec"><h4>BÀI TOÁN</h4><p>${t.prob}</p></div>
+   <div class="sec"><h4>CƠ CHẾ</h4><p>${t.mech}</p></div>
+   <div class="sec ml"><h4>NEO VÀO ML</h4><p>${t.ml}</p></div>
+   <div class="sec trap"><h4>CÁI BẪY / ĐIỀU PHẢI NHỚ</h4><p>${t.trap}</p></div>`;
+  ov.classList.add('on'); modal.scrollTop=0;
+});
+ov.onclick=e=>{if(e.target===ov)ov.classList.remove('on')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')ov.classList.remove('on')});
+</script>
+</body>
+</html>

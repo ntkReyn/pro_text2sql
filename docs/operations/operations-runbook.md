@@ -7,6 +7,7 @@ Tài liệu này quy định cách cấu hình, phát hành, giám sát và xử
 Các thiết kế chức năng và dữ liệu được mô tả tại:
 
 - [Kiến trúc hệ thống](../architecture/system-architecture.md)
+- [Kiến trúc Wren + Datus](../architecture/wren-datus-semantic-architecture.md)
 - [Yêu cầu sản phẩm](../product/product-requirements.md)
 - [Thiết kế dữ liệu](../data/data-design-governance.md)
 - [Quyết định kiến trúc](../decisions/architecture-decision-records.md)
@@ -22,10 +23,14 @@ Các thiết kế chức năng và dữ liệu được mô tả tại:
 | `packages/semantic_layer` | Metric, dimension, join và glossary | Cao | Chưa phân công |
 | Analytics database | Nguồn dữ liệu truy vấn read-only | Cao | Chưa phân công |
 | LLM provider | Phân tích ý định, sinh SQL và diễn giải kết quả | Cao | Chưa phân công |
+| Wren Engine/MDL | Semantic authority và compile/dry plan mục tiêu | Cao | Chưa phân công |
+| Datus | Orchestration, context, memory và bounded repair mục tiêu | Cao | Chưa phân công |
 | State/audit store | Trạng thái hội thoại và dấu vết kiểm toán | Cao | Chưa phân công |
 | Telemetry backend | Trace, metric, log và cảnh báo | Trung bình | Chưa phân công |
 
 Trước pilot, mỗi thành phần phải có technical owner, kênh liên hệ khi sự cố và danh sách dependency.
+
+Trong Week 1/B0, Wren và Datus chưa là service runtime: planner/compiler cục bộ phải tiếp tục hoạt động khi hai dependency này vắng mặt. Khi bật adapters, readiness phải kiểm tra chúng riêng và tuyệt đối không tự fallback sang một semantic formula khác mà không ghi evidence/version.
 
 ## 3. Môi trường
 

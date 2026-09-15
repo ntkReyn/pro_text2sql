@@ -1327,7 +1327,7 @@
         <div class="atlas-sidebar-spacer"></div>
         <div class="atlas-user">
           <span class="atlas-avatar">MA</span>
-          <span class="atlas-user-copy"><strong>Minh Anh</strong><span>Supply Chain Lead</span></span>
+          <span class="atlas-user-copy"><strong>Minh Anh</strong><span>EV Operations Analyst</span></span>
           <i data-lucide="chevron-down" aria-hidden="true"></i>
         </div>
       </aside>
@@ -1335,7 +1335,7 @@
       <div class="atlas-app-main">
         <header class="atlas-topbar">
           <div class="atlas-workspace">
-            <strong>Supplier performance</strong>
+            <strong>EV charging analytics</strong>
             <span>Vietnam Operations · Dữ liệu đã được cấp quyền</span>
           </div>
           <div class="atlas-top-actions">
@@ -1353,12 +1353,12 @@
           </section>
 
           <section class="atlas-composer" aria-label="Nhập câu hỏi phân tích">
-            <textarea id="atlas-question" aria-label="Câu hỏi" placeholder="Ví dụ: Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 90 ngày gần đây?">Top 5 nhà cung cấp có tỷ lệ giao hàng trễ cao nhất trong 90 ngày gần đây?</textarea>
+            <textarea id="atlas-question" aria-label="Câu hỏi" placeholder="Ví dụ: Tỷ lệ phiên sạc thành công theo khu vực trạm trong quý 3 năm 2026?">Tỷ lệ phiên sạc thành công theo khu vực trạm trong quý 3 năm 2026?</textarea>
             <div class="atlas-composer-footer">
               <div class="atlas-context" aria-label="Gợi ý câu hỏi">
-                <button type="button" data-prompt="So sánh tỷ lệ giao đúng hạn giữa các khu vực trong quý này">So sánh theo khu vực</button>
-                <button type="button" data-prompt="Xu hướng số lượng giao trễ theo tuần thay đổi như thế nào?">Xem xu hướng</button>
-                <button type="button" data-prompt="Nhà cung cấp nào cải thiện nhiều nhất so với quý trước?">So với quý trước</button>
+                <button type="button" data-prompt="So sánh tỷ lệ sạc thành công giữa các khu vực trạm trong quý này">So sánh theo khu vực</button>
+                <button type="button" data-prompt="Xu hướng số phiên sạc thất bại theo tuần thay đổi như thế nào?">Xem xu hướng</button>
+                <button type="button" data-prompt="Dòng xe nào nhận nhiều điện năng nhất?">Theo dòng xe</button>
               </div>
               <button class="atlas-query-submit" id="atlas-run-query" type="button"><span>Phân tích</span><i data-lucide="arrow-up" aria-hidden="true"></i></button>
             </div>
@@ -1374,23 +1374,21 @@
             <article class="atlas-result-panel">
               <div class="atlas-result-head">
                 <div class="atlas-result-title">
-                  <span>Kết quả · 90 ngày gần đây</span>
-                  <h2>Nhà cung cấp có tỷ lệ giao hàng trễ cao nhất</h2>
+                  <span>Kết quả · Quý 3/2026</span>
+                  <h2>Tỷ lệ phiên sạc thành công theo khu vực trạm</h2>
                 </div>
                 <span class="atlas-verified"><i data-lucide="shield-check" aria-hidden="true"></i> Đã xác minh</span>
               </div>
 
-              <div class="atlas-highlight"><strong>18,6%</strong><span>Vina Components · 43 / 231 đơn hàng</span></div>
+              <div class="atlas-highlight"><strong>76,9%</strong><span>10 / 13 phiên sạc đủ điều kiện</span></div>
 
-              <div class="atlas-bars" role="img" aria-label="Biểu đồ xếp hạng tỷ lệ giao hàng trễ của 5 nhà cung cấp">
-                <div class="atlas-bar-row"><span>Vina Components</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:100%"></span></span><strong>18,6%</strong></div>
-                <div class="atlas-bar-row"><span>Eastbridge</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:85%"></span></span><strong>15,8%</strong></div>
-                <div class="atlas-bar-row"><span>Pacific Parts</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:71%"></span></span><strong>13,2%</strong></div>
-                <div class="atlas-bar-row"><span>Mekong Supply</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:59%"></span></span><strong>11,0%</strong></div>
-                <div class="atlas-bar-row"><span>Northstar</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:48%"></span></span><strong>8,9%</strong></div>
+              <div class="atlas-bars" role="img" aria-label="Biểu đồ tỷ lệ phiên sạc thành công theo khu vực trạm">
+                <div class="atlas-bar-row"><span>Khu vực phía Nam</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:100%"></span></span><strong>100%</strong></div>
+                <div class="atlas-bar-row"><span>Khu vực miền Trung</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:67%"></span></span><strong>66,7%</strong></div>
+                <div class="atlas-bar-row"><span>Khu vực phía Bắc</span><span class="atlas-bar-track"><span class="atlas-bar-fill" style="width:60%"></span></span><strong>60%</strong></div>
               </div>
 
-              <div class="atlas-insight"><i data-lucide="sparkles" aria-hidden="true"></i><span>Vina Components cao hơn mức trung bình nhóm 6,1 điểm phần trăm. Kết quả mang tính mô tả; cần xem thêm warehouse và nhóm sản phẩm để điều tra.</span></div>
+              <div class="atlas-insight"><i data-lucide="sparkles" aria-hidden="true"></i><span>Khu vực phía Bắc có tỷ lệ thấp nhất trong dữ liệu mẫu. Kết quả mang tính mô tả; cần xem thêm theo trạm và lý do dừng phiên sạc.</span></div>
             </article>
 
             <aside class="atlas-evidence">
@@ -1399,10 +1397,10 @@
                 <i data-lucide="chevron-down" aria-hidden="true"></i>
               </button>
               <div class="atlas-evidence-body" id="atlas-evidence-body">
-                <div class="atlas-evidence-item"><span>Metric</span><strong>Late delivery rate · v1.2</strong></div>
-                <div class="atlas-evidence-item"><span>Công thức</span><strong>Đơn giao trễ / đơn đủ điều kiện</strong></div>
-                <div class="atlas-evidence-item"><span>Bộ lọc</span><strong>90 ngày · Không gồm đơn hủy</strong></div>
-                <div class="atlas-evidence-item"><span>Grain</span><strong>Supplier</strong></div>
+                <div class="atlas-evidence-item"><span>Metric</span><strong>Charging success rate · v1.0</strong></div>
+                <div class="atlas-evidence-item"><span>Công thức</span><strong>Phiên thành công / phiên hoàn tất hoặc thất bại</strong></div>
+                <div class="atlas-evidence-item"><span>Bộ lọc</span><strong>Quý 3/2026 · Loại phiên hủy/đang sạc</strong></div>
+                <div class="atlas-evidence-item"><span>Grain</span><strong>Khu vực trạm</strong></div>
                 <div class="atlas-evidence-item"><span>Độ mới dữ liệu</span><strong>08:35 · 14/09/2026</strong></div>
                 <div class="atlas-divider"></div>
                 <button class="atlas-code-button" type="button"><i data-lucide="code-2" aria-hidden="true"></i>Xem truy vấn đã kiểm tra</button>
@@ -1420,7 +1418,7 @@
           <div class="atlas-auth-copy">
             <span class="atlas-auth-eyebrow">Từ câu hỏi đến quyết định</span>
             <h2>Dữ liệu phức tạp.<br>Câu trả lời rõ ràng.</h2>
-            <p>Khám phá hiệu suất chuỗi cung ứng bằng ngôn ngữ tự nhiên, với metric nhất quán và bằng chứng có thể kiểm tra.</p>
+            <p>Khám phá vận hành sạc xe điện bằng ngôn ngữ tự nhiên, với metric nhất quán và bằng chứng có thể kiểm tra.</p>
           </div>
           <div class="atlas-proof">
             <span><i data-lucide="shield-check" aria-hidden="true"></i>Truy cập theo quyền</span>
@@ -1462,7 +1460,7 @@
           <div class="atlas-auth-copy">
             <span class="atlas-auth-eyebrow">Bắt đầu có kiểm soát</span>
             <h2>Một không gian chung.<br>Một định nghĩa KPI.</h2>
-            <p>Tạo workspace cho đội ngũ, kết nối nguồn dữ liệu đã duyệt và bắt đầu từ vertical slice supplier performance.</p>
+            <p>Tạo workspace cho đội ngũ, kết nối nguồn dữ liệu đã duyệt và bắt đầu từ vertical slice EV charging analytics.</p>
           </div>
           <div class="atlas-proof">
             <span><i data-lucide="lock-keyhole" aria-hidden="true"></i>Bảo vệ dữ liệu</span>

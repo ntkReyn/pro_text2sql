@@ -1,17 +1,79 @@
 name: pro-text2sql
 
+x-app-image: &app-image
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: pro-text2sql:local
+
 services:
+  db:
+    image: postgres:17-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pro_text2sql}
+      POSTGRES_USER: ${POSTGRES_USER:-pro_text2sql_owner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_owner_change_me}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+
+  migrate:
+    <<: *app-image
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:-pro_text2sql}
+      POSTGRES_USER: ${POSTGRES_USER:-pro_text2sql_owner}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_owner_change_me}
+      ANALYTICS_DATABASE_READONLY_USER: ${ANALYTICS_DATABASE_READONLY_USER:-analytics_readonly}
+      ANALYTICS_DATABASE_READONLY_PASSWORD: ${ANALYTICS_DATABASE_READONLY_PASSWORD:-local_readonly_change_me}
+      ANALYTICS_DATABASE_STATEMENT_TIMEOUT_MS: ${ANALYTICS_DATABASE_STATEMENT_TIMEOUT_MS:-15000}
+    command: ["python", "scripts/migrate_database.py"]
+    init: true
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: pro-text2sql:local
+    <<: *app-image
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     env_file:
       - path: .env
         required: true
     environment:
       API_HOST: 0.0.0.0
       API_PORT: "8000"
+      # Do not expose bootstrap credentials inherited from .env to the app.
+      POSTGRES_USER: ""
+      POSTGRES_PASSWORD: ""
+      ANALYTICS_DATABASE_READONLY_PASSWORD: ""
+      ANALYTICS_DATABASE_PROVIDER: postgresql
+      ANALYTICS_DATABASE_URL: postgresql://${ANALYTICS_DATABASE_READONLY_USER:-analytics_readonly}:${ANALYTICS_DATABASE_READONLY_PASSWORD:-local_readonly_change_me}@db:5432/${POSTGRES_DB:-pro_text2sql}
+      ANALYTICS_DATABASE_DIALECT: postgresql
+      ANALYTICS_DATABASE_POOL_MODE: direct
+      ANALYTICS_DATABASE_SSL_MODE: disable
       EMBEDDING_DEVICE: cpu
       RERANKER_DEVICE: cpu
       EMBEDDING_LOCAL_FILES_ONLY: "true"
@@ -34,3 +96,5 @@ services:
     cap_drop:
       - ALL
 
+volumes:
+  postgres_data:

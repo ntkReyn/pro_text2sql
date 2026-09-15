@@ -1,0 +1,16 @@
+{
+  "catalog_version": "1.0.0",
+  "locale": "vi-VN",
+  "values": [
+    {"field":"province_name","canonical_value":"Ha Noi","aliases_vi":["Hà Nội","HN"],"classification":"internal"},
+    {"field":"province_name","canonical_value":"Da Nang","aliases_vi":["Đà Nẵng"],"classification":"internal"},
+    {"field":"province_name","canonical_value":"Ho Chi Minh","aliases_vi":["Hồ Chí Minh","TP HCM","TPHCM","Sài Gòn"],"classification":"internal"},
+    {"field":"station_scope","canonical_value":"public","aliases_vi":["công cộng","trạm công cộng"],"classification":"internal"},
+    {"field":"station_scope","canonical_value":"dealer","aliases_vi":["đại lý","trạm đại lý"],"classification":"internal"},
+    {"field":"station_scope","canonical_value":"workplace","aliases_vi":["nơi làm việc","cơ quan"],"classification":"internal"},
+    {"field":"station_scope","canonical_value":"home","aliases_vi":["tại nhà","trạm nhà"],"classification":"internal"},
+    {"field":"vehicle_status","canonical_value":"active","aliases_vi":["xe đang hoạt động","đang hoạt động"],"classification":"internal"},
+    {"field":"customer_region_code","canonical_value":"N","aliases_vi":["khách hàng miền Bắc","khách hàng phía Bắc"],"classification":"internal"},
+    {"field":"station_region_code","canonical_value":"N","aliases_vi":["trạm miền Bắc","trạm phía Bắc"],"classification":"internal"}
+  ]
+}

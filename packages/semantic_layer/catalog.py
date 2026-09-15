@@ -91,6 +91,6 @@ class SemanticCatalog:
 def load_default_catalog() -> SemanticCatalog:
     root = Path(__file__).resolve().parent
     return SemanticCatalog.from_files(
-        root / "metrics" / "supplier_delivery_metrics.v1.json",
-        root / "dimensions" / "supplier_delivery_dimensions.v1.json",
+        root / "metrics" / "ev_customer_metrics.v1.json",
+        root / "dimensions" / "ev_customer_dimensions.v1.json",
     )

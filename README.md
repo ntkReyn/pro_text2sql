@@ -1,6 +1,6 @@
 # Agentic Analytics & Semantic Text-to-SQL
 
-Bộ khung cho một sản phẩm phân tích dữ liệu bằng ngôn ngữ tự nhiên. Người dùng đặt câu hỏi, hệ thống hiểu ngữ cảnh nghiệp vụ, chọn metric/dimension hợp lệ, tạo và kiểm tra SQL, thực thi trên dữ liệu read-only, rồi trả về kết quả kèm insight, biểu đồ và bằng chứng.
+Bộ khung cho sản phẩm phân tích dữ liệu khách hàng, xe điện, pin, trạm/phiên sạc và dịch vụ bằng ngôn ngữ tự nhiên. Kiến trúc đích dùng Wren làm semantic authority duy nhất và Datus làm orchestrator/memory; repository hiện cung cấp baseline cục bộ tương thích contract để đo lường trước khi nối hai runtime này.
 
 ## Mục tiêu kiến trúc
 
@@ -55,61 +55,100 @@ Bộ khung cho một sản phẩm phân tích dữ liệu bằng ngôn ngữ t�
 └── notebooks/            # Khám phá dữ liệu; prototype không đặt vào production path
 ```
 
-## Luồng xử lý dự kiến
+## Luồng xử lý theo kiến trúc mới
 
 ```text
-User question
-    ↓
-API → conversation/state
-    ↓
-intent/router → semantic layer (metric + dimension + grain)
-    ↓
-SQL generator → SQL validator/policy check
-    ↓                         ↘ clarification / repair (có giới hạn)
-read-only execution → result profiler
-    ↓
-insight + visualization + evidence
-    ↓
-final answer + audit record
+Question → normalizer → answerability/ambiguity gate
+  → Datus orchestrator
+  → context router [Wren MDL + Datus memory + governed values]
+  → graph expansion + Semantic-DAIL examples
+  → LLM proposes typed SemanticQueryPlan
+  → deterministic validation → Wren compile/dry plan
+  → read-only execution → semantic/runtime verification
+  → answer + evidence | bounded repair | clarification
 ```
+
+Chi tiết và ranh giới authority: [kiến trúc Wren + Datus](docs/architecture/wren-datus-semantic-architecture.md). Hai file [lab requirements](docs/lab_requirement.md) và [ViTAI architecture map](docs/vitai-architecture-map.html) là context domain/data-platform; [Week 1](docs/main_docs/week1.md) được giữ nguyên làm specification gốc.
 
 ## Lộ trình triển khai khuyến nghị
 
-1. **Level 1:** schema, seed data, 5–10 metric cơ bản, SQL generation, validator tối thiểu và unit/integration test.
-2. **Level 2:** semantic layer có metric contract, dimension/grain, glossary, câu hỏi cần làm rõ và follow-up context.
-3. **Level 3:** workflow state rõ ràng, retry/repair có giới hạn, audit trail và visualization.
-4. **Level 4:** read-only database, allowlist, timeout/row limit, PII policy, benchmark, latency/cost metrics, demo và deployment.
+1. **Week 1/B0:** schema, seed/generator cố định, 16 câu hỏi, ground truth semantic plan, planner rule và deterministic compiler.
+2. **B1:** value index, graph retrieval, ambiguity/answerability gate và Semantic-DAIL example selection.
+3. **B2:** Wren adapter + MDL parity tests; metric được phê duyệt chỉ tồn tại ở Wren.
+4. **B3:** Datus custom semantic adapter, memory và bounded repair.
+5. **B4:** read-only execution, result verification, evidence, audit và production gate.
 
 Không cần triển khai toàn bộ agent ngay từ đầu. Với các luồng đã biết trước, workflow cố định dễ kiểm thử hơn; chỉ thêm agent ở nơi cần quyết định động, ví dụ chọn metric, phát hiện thiếu thông tin hoặc sửa lỗi SQL.
 
 Phạm vi hiện tại dùng pretrained LLM qua prompting, retrieval và structured output. Training, fine-tuning và reinforcement learning được để ở future work sau khi có baseline, failure taxonomy và evaluation gate đáng tin cậy.
 
-## Chạy bằng một Docker container
+## Chạy local bằng Docker Compose
 
-Ứng dụng được đóng gói thành một image CPU và chạy bằng một service duy nhất trong `compose.yaml`. Supabase và OpenAI là dịch vụ bên ngoài. Hai model Hugging Face local được mount read-only từ cache trên máy host, không được sao chép vào image.
+Compose khởi động một application service cùng PostgreSQL local và migration
+runner. PostgreSQL là backing service cho phát triển; đây không phải topology
+production. OpenAI vẫn là dịch vụ bên ngoài. Hai model Hugging Face local được
+mount read-only từ cache trên máy host, không được sao chép vào image.
 
-1. Sao chép `.env.example` thành `.env` và điền credential runtime.
-2. Đặt `HF_CACHE_HOST_PATH` thành thư mục Hugging Face trên máy host. Trên máy hiện tại:
+Các service:
+
+- `db`: PostgreSQL 17 với dữ liệu lưu trong named volume `postgres_data`;
+- `migrate`: áp dụng file trong `db/migrations/`, nạp `data/seeds/`, tạo và cấp
+  quyền cho runtime role read-only, sau đó kết thúc;
+- `app`: API, chỉ khởi động sau khi migration thành công và kết nối database
+  bằng runtime role read-only.
+
+1. Sao chép `.env.example` thành `.env`. Các mật khẩu PostgreSQL mẫu chỉ dành
+   cho local; có thể thay chúng trước lần chạy đầu tiên.
+2. Điền `LLM_API_KEY` nếu cần gọi LLM.
+3. Đặt `HF_CACHE_HOST_PATH` thành thư mục Hugging Face trên máy host. Trên máy
+   hiện tại:
 
    ```env
    HF_CACHE_HOST_PATH=C:/Users/Admin/.cache/huggingface
    ```
 
-3. Build và khởi động container:
+4. Build và khởi động toàn bộ môi trường:
 
    ```powershell
-   docker compose build
-   docker compose up -d
+   docker compose up --build -d
    ```
 
-4. Kiểm tra API:
+   Trong lần chạy đầu, `migrate` tạo schema `analytics`, nạp fixture
+  EV customer MVP và tạo tài khoản
+  `ANALYTICS_DATABASE_READONLY_USER`.
+
+5. Kiểm tra trạng thái và API:
 
    ```powershell
+   docker compose ps
+   docker compose logs migrate
    Invoke-RestMethod http://localhost:8000/health/live
    Invoke-RestMethod http://localhost:8000/health/ready
    ```
 
-`/health/live` xác nhận tiến trình API đang chạy. `/health/ready` chỉ trả `200` khi Supabase URL, OpenAI key và cả hai model cache đều sẵn sàng; endpoint chỉ trả trạng thái boolean và không trả credential.
+`/health/live` xác nhận tiến trình API đang chạy. `/health/ready` chỉ trả `200`
+khi URL PostgreSQL, OpenAI key và cả hai model cache đều được cấu hình/sẵn sàng;
+endpoint chỉ trả trạng thái boolean và không trả credential.
+
+Kiểm tra fixture EV customer bằng tài khoản owner local mặc định:
+
+```powershell
+docker compose exec db psql -U pro_text2sql_owner -d pro_text2sql -c "SELECT vehicle_id, customer_id, state_of_health_pct, completed_charging_session_count FROM analytics.customer_vehicle_overview_v1 ORDER BY vehicle_id;"
+```
+
+Contract của sáu bảng và các giả định dữ liệu được mô tả tại
+[`docs/data/ev-customer-mvp-schema.md`](docs/data/ev-customer-mvp-schema.md).
+
+Migration và seed được ghi checksum vào
+`public.database_change_history`. Không sửa file SQL đã được áp dụng; hãy tạo
+file có số thứ tự mới. Trong trường hợp chỉ cần làm lại dữ liệu local dùng một
+lần, có thể xóa named volume và khởi tạo lại:
+
+```powershell
+# CẢNH BÁO: lệnh này xóa toàn bộ database local trong named volume.
+docker compose down --volumes
+docker compose up --build -d
+```
 
 Các lệnh vận hành cơ bản:
 
@@ -118,7 +157,10 @@ docker compose logs -f app
 docker compose down
 ```
 
-Container chạy bằng non-root user, root filesystem read-only và không có Linux capabilities. File `.env` bị loại khỏi Docker build context; credential chỉ được nạp tại runtime.
+Application và migration container chạy bằng non-root user, root filesystem
+read-only và không có Linux capabilities. File `.env` bị loại khỏi Docker build
+context; credential chỉ được nạp tại runtime. PostgreSQL owner chỉ được cấp cho
+service `migrate`; `app` nhận URL của runtime role read-only.
 
 ## Quy ước ban đầu
 
@@ -131,6 +173,14 @@ Container chạy bằng non-root user, root filesystem read-only và không có 
 
 ## Trạng thái hiện tại
 
-Repository đang ở giai đoạn scaffold. API hiện có health/readiness endpoint và Docker baseline; workflow Text-to-SQL chưa được triển khai. Các file `.gitkeep` chỉ giữ chỗ cho những thư mục chưa có mã nguồn; khi thư mục có nội dung thật, có thể xóa file đó.
+Week 1/B0 đã có 6 bảng nguồn, 7 semantic marts/views, 13 metric draft, 19 dimension, fixture SQL, generator synthetic seed `42`, 16 câu hỏi có expected logic/plan, deterministic Vietnamese planner, compiler PostgreSQL và tests. API có `POST /api/v1/query/plan-baseline` và `POST /api/v1/query/baseline` cho question → plan → SQL. Màn UI `Cuộc trò chuyện` đã gọi endpoint này qua Next.js same-origin proxy và hiển thị plan/evidence/SQL theo role. Baseline mới dừng ở plan/compile; execution, Wren adapter, Datus adapter và result verification vẫn là công việc kế tiếp.
+
+Chạy baseline và tests:
+
+```powershell
+python -m unittest discover -s tests -v
+python scripts/evaluate_baseline.py
+python scripts/generate_ev_customer_data.py --seed 42 --customers 24
+```
 
 Điểm bắt đầu của bộ tài liệu dự án: [docs/index.md](docs/index.md).

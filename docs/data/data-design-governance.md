@@ -6,6 +6,8 @@ Tài liệu quy định cách thiết kế, mô tả, kiểm thử và quản tr
 
 Schema vật lý chỉ được triển khai sau khi logical model được đối chiếu với nguồn dữ liệu thực và được data owner phê duyệt.
 
+Hai nguồn context không chỉnh sửa là `docs/lab_requirement.md` và `docs/vitai-architecture-map.html`. Chúng xác định north star Raw/Bronze → Silver → Gold cho telemetry EV. MVP hiện bắt đầu tại các Gold-like PostgreSQL marts bằng dữ liệu synthetic; không xem seed này là bản sao production.
+
 ## 2. Nguyên tắc
 
 ### Khai báo grain trước khi thiết kế fact table
@@ -22,6 +24,8 @@ Mỗi fact table phải có một câu mô tả “mỗi dòng đại diện cho
 ### Metric là contract có owner
 
 LLM, prompt, UI và ad-hoc query không phải nguồn định nghĩa KPI. Metric chỉ được sử dụng khi có công thức, grain, time dimension, owner, version và test.
+
+Wren MDL/Engine là semantic source of truth mục tiêu. Datus memory và Semantic-DAIL examples chỉ tham chiếu metric ID/version; không sao chép công thức. Catalog JSON trong repo là baseline migration/contract fixture trước khi Wren adapter đạt parity.
 
 ### Join phải có cardinality
 
@@ -40,6 +44,7 @@ Metric theo thời gian phải xác định event time, timezone, calendar, cuto
 | Mart | `data/marts/` | Fact/dimension theo business process |
 | Seed | `data/seeds/` | Reference data nhỏ và có phiên bản |
 | Sample | `data/samples/` | Dataset đã ẩn danh dùng cho test và demo |
+| Local generated | `data/local/generated/` | JSONL synthetic từ seed cố định, bị loại khỏi Git |
 
 Không commit production data, PII, credential hoặc dữ liệu không rõ quyền sử dụng.
 
@@ -61,28 +66,22 @@ Logical model dưới đây là phạm vi thiết kế ban đầu. Tên, key và
 
 | Model | Grain | Mục đích |
 |---|---|---|
-| `dim_supplier` | Một dòng cho một supplier version | Thuộc tính và phân loại supplier |
-| `dim_product` | Một dòng cho một product/SKU version | Thuộc tính sản phẩm và category |
-| `dim_warehouse` | Một dòng cho một warehouse version | Thuộc tính kho, location và timezone |
-| `dim_region` | Một dòng cho một business region | Phân tích và phân quyền theo vùng |
-| `fact_purchase_order_line` | Một dòng cho một PO line version hoặc event | Số lượng đặt, ngày đặt và ngày cam kết |
-| `fact_delivery_line` | Một dòng cho một delivery/receipt event gắn với PO line | Số lượng và thời điểm giao thực tế |
-| `fact_inventory_snapshot` | Một dòng cho product × warehouse × snapshot time | Trạng thái tồn kho tại một thời điểm |
-| `fact_inventory_movement` | Một dòng cho một inventory movement event | Giải thích biến động tồn kho |
-| `fact_operating_cost` | Grain cần xác định theo nguồn kế toán | Phân tích chi phí vận hành |
+| `dim_customer` | Một dòng hiện tại cho một khách hàng giả lập | Phân khúc và khu vực khách hàng không chứa định danh trực tiếp |
+| `dim_vehicle` | Một dòng hiện tại cho một xe giả lập | Dòng xe, năm sản xuất và chủ sở hữu hiện tại |
+| `fact_battery_health_snapshot` | Một quan sát pin cho một xe tại một thời điểm | Theo dõi SOH, SOC, dung lượng và số chu kỳ |
+| `dim_charging_station` | Một dòng hiện tại cho một địa điểm sạc giả lập | Loại trạm, vùng, công suất và connector |
+| `fact_charging_session` | Một lần thử sạc | Trạng thái, điện năng, thời lượng và chi phí |
+| `fact_service_visit` | Một lượt xe tới trung tâm dịch vụ | Trạng thái, loại dịch vụ và vấn đề lặp lại |
 
 ### Quan hệ dự kiến
 
 ```mermaid
 erDiagram
-    DIM_SUPPLIER ||--o{ FACT_PURCHASE_ORDER_LINE : supplies
-    DIM_PRODUCT ||--o{ FACT_PURCHASE_ORDER_LINE : ordered
-    FACT_PURCHASE_ORDER_LINE ||--o{ FACT_DELIVERY_LINE : fulfilled_by
-    DIM_PRODUCT ||--o{ FACT_INVENTORY_SNAPSHOT : stocked_as
-    DIM_WAREHOUSE ||--o{ FACT_INVENTORY_SNAPSHOT : stores
-    DIM_PRODUCT ||--o{ FACT_INVENTORY_MOVEMENT : moved_as
-    DIM_WAREHOUSE ||--o{ FACT_INVENTORY_MOVEMENT : occurs_at
-    DIM_REGION ||--o{ DIM_WAREHOUSE : contains
+    DIM_CUSTOMER ||--o{ DIM_VEHICLE : currently_owns
+    DIM_VEHICLE ||--o{ FACT_BATTERY_HEALTH_SNAPSHOT : has
+    DIM_VEHICLE ||--o{ FACT_CHARGING_SESSION : charges
+    DIM_CHARGING_STATION ||--o{ FACT_CHARGING_SESSION : hosts
+    DIM_VEHICLE ||--o{ FACT_SERVICE_VISIT : receives
 ```
 
 ERD mô tả quan hệ logic, không thay thế foreign key và cardinality test trên dữ liệu thật.
@@ -255,10 +254,10 @@ Các quyết định bắt buộc:
 | Model | Test |
 |---|---|
 | Dimension | Business key, uniqueness theo history strategy, status values |
-| PO line | Grain, supplier/product relationship, quantity và date consistency |
-| Delivery line | Grain, PO-line relationship, quantity và actual date |
-| Inventory snapshot | Product-warehouse-time uniqueness, quantity domain và freshness |
-| Inventory movement | Movement key, reversal reference và quantity balance |
+| Vehicle | Current-owner relationship, status và date consistency |
+| Battery snapshot | Vehicle-time uniqueness, percentage domain và pack replacement |
+| Charging session | Vehicle/station relationship, status, time, energy và cost consistency |
+| Service visit | Vehicle relationship, lifecycle time và monetary null semantics |
 
 Failure severity quyết định model bị block, quarantine hay chỉ warning. Ngưỡng phải được data owner phê duyệt.
 
@@ -337,9 +336,9 @@ Breaking metric change tạo version mới hoặc migration rõ ràng. Không s�
 
 - Source systems và data owners;
 - Analytics database và SQL dialect;
-- Grain chính xác của PO, delivery và operating cost;
-- Định nghĩa delivered, late, cancelled, returned và available inventory;
-- History strategy cho supplier, product và warehouse;
+- Grain chính xác của charging session, battery snapshot và service visit;
+- Định nghĩa successful charge, failed attempt, current battery health và repeat issue;
+- History strategy cho customer ownership, vehicle, battery pack và charging station;
 - Fiscal calendar, timezone và cutoff;
 - Freshness requirements;
 - Classification, masking và retention;

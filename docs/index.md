@@ -8,11 +8,16 @@ Thư mục `docs/` chứa các tài liệu dùng để thiết kế, phát tri�
 |---|---|---|
 | [Yêu cầu sản phẩm](product/product-requirements.md) | Người dùng, bài toán, phạm vi, yêu cầu chức năng và tiêu chí thành công | Draft |
 | [Kiến trúc hệ thống](architecture/system-architecture.md) | Ranh giới hệ thống, thành phần, luồng xử lý, contract và quality attributes | Draft |
+| [Kiến trúc Wren + Datus](architecture/wren-datus-semantic-architecture.md) | Quyết định authority, request flow mới, cách áp dụng hai paper và lộ trình adapters | Accepted direction |
 | [Thiết kế dữ liệu](data/data-design-governance.md) | Grain, mô hình dữ liệu, metric, join, quality và governance | Draft |
+| [EV Customer MVP schema](data/ev-customer-mvp-schema.md) | Schema PostgreSQL giả lập cho customer, vehicle, battery, charging và service | Draft |
 | [Quyết định kiến trúc](decisions/architecture-decision-records.md) | Decision log, quy trình và mẫu ADR | Draft |
 | [Sổ tay vận hành](operations/operations-runbook.md) | Release, guardrail, observability, incident và production readiness | Draft |
 | [Lộ trình phát triển](roadmap/product-roadmap.md) | Giai đoạn thực hiện, sản phẩm bàn giao và cổng nghiệm thu | Draft |
 | [Research map Text-to-SQL](research/text_to_sql_research_map.md) | Đối chiếu công trình nền tảng, kỹ thuật khả thi và hướng nghiên cứu tương lai | Draft |
+| [Week 1 gốc](main_docs/week1.md) | Specification gốc cho data, question set, ground truth, baseline và improvement | Source/immutable |
+| [Lab requirements](lab_requirement.md) | Context telemetry-to-range-estimation và 18 lab data/ML | Source/immutable |
+| [ViTAI architecture map](vitai-architecture-map.html) | Context platform, hot/cold path và Customer360/Vehicle360/Mobility360 | Source/immutable |
 
 ## Phạm vi trách nhiệm
 
@@ -22,6 +27,8 @@ Khi nội dung xuất hiện ở nhiều tài liệu, nguồn chính được x�
 |---|---|
 | Persona, use case, MVP và yêu cầu UX | `product/product-requirements.md` |
 | Component, dependency, workflow và contract | `architecture/system-architecture.md` |
+| Semantic authority Wren, orchestration Datus và adapter boundary | `architecture/wren-datus-semantic-architecture.md` + ADR-0015 |
+| Yêu cầu Week 1 và north-star EV data platform | `main_docs/week1.md`, `lab_requirement.md`, `vitai-architecture-map.html` |
 | Table, grain, metric, dimension, join và data policy | `data/data-design-governance.md` |
 | Lý do chọn một phương án kỹ thuật | ADR trong `decisions/` |
 | Cấu hình runtime, release, SLO và incident | `operations/operations-runbook.md` |

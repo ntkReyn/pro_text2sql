@@ -2,12 +2,13 @@
 
 ## Phạm vi và kết luận ngắn
 
-Repository hiện là một scaffold cho hệ thống hỏi đáp phân tích dữ liệu chuỗi cung ứng và tồn kho. Bài toán thực tế không phải chỉ là sinh một câu SQL hợp cú pháp, mà là:
+Repository hiện là scaffold cho hệ thống hỏi đáp phân tích dữ liệu khách hàng, xe điện, pin, trạm/phiên sạc và dịch vụ. Bài toán thực tế không phải chỉ là sinh một câu SQL hợp cú pháp, mà là:
 
 ```text
-câu hỏi nghiệp vụ
-  → metric/dimension/time/grain đã được phê duyệt
-  → semantic query plan
+câu hỏi nghiệp vụ → answerability gate → Datus orchestration
+  → Wren metric/dimension/time/grain đã được phê duyệt
+  → graph/value retrieval + Semantic-DAIL examples
+  → typed semantic query plan → Wren/compiler access plan
   → SQL chỉ đọc đã qua policy và AST validation
   → verified result
   → answer + chart + evidence + audit
@@ -15,7 +16,7 @@ câu hỏi nghiệp vụ
 
 Phạm vi triển khai hiện tại là **training-free**: dùng pretrained LLM qua prompting, retrieval và structured output. Training, fine-tuning và reinforcement learning được ghi nhận riêng như future work, không phải điều kiện hoàn thành MVP hoặc các gate hiện tại.
 
-Các tài liệu trong `docs/` đã đặt đúng những rào chắn quan trọng: semantic-first, metric contract, approved join graph, bounded workflow, clarification, read-only execution, result verification, evidence, audit và evaluation theo từng stage. Các công trình Text-to-SQL có thể cung cấp nền tảng cho schema linking, intermediate representation, constrained decoding, prompting, conversation state và execution-guided correction; tuy nhiên không công trình nào bao phủ đầy đủ metric governance, authorization, freshness, lineage và vận hành production như repository này.
+Các tài liệu trong `docs/` đặt semantic-first, metric contract, approved join graph, bounded workflow, clarification, read-only execution, result verification, evidence, audit và evaluation theo từng stage. Kiến trúc mới chốt Wren là semantic authority và Datus là orchestrator/memory. Hai paper trung tâm vẫn được áp dụng: Semantic-Layer-Mediated Agent làm backbone; DAIL-SQL được biến đổi thành Semantic-DAIL trên question/plan skeleton thay vì direct SQL.
 
 Khuyến nghị phát triển theo thứ tự:
 
@@ -24,7 +25,17 @@ Khuyến nghị phát triển theo thứ tự:
 3. Sinh SQL từ plan bằng structured output; kiểm tra AST và database privilege.
 4. Thêm execution-guided repair hữu hạn, chỉ cho lỗi repairable.
 5. Đo result correctness, metric correctness, evidence completeness, security, latency và cost riêng biệt.
-6. Đưa multi-agent vào P2; giữ training, fine-tuning và reinforcement learning ngoài delivery roadmap cho tới khi đạt các điều kiện Future Work.
+6. Tích hợp Wren qua parity adapter, rồi Datus qua custom semantic adapter; không chạy Dosi và Wren như hai nguồn KPI.
+7. Giữ training, fine-tuning và reinforcement learning ngoài delivery roadmap cho tới khi đạt các điều kiện Future Work.
+
+### Hai paper cốt lõi được đặt ở đâu
+
+| Paper | Vai trò còn áp dụng | Điều chỉnh cho repository |
+|---|---|---|
+| Semantic-Layer-Mediated Agent | Kiến trúc xương sống: agent bắt buộc qua semantic layer | Wren MDL/Engine là authority; Datus không được bypass hoặc định nghĩa lại metric |
+| Text-to-SQL Empowered by LLM / DAIL-SQL | Chọn demonstration theo similarity và skeleton, tối ưu context | Retrieval theo question skeleton + `SemanticQueryPlan` skeleton; examples gắn metric version/scope, output là plan chứ không phải raw SQL |
+
+Vì vậy hai paper không bị loại. Chúng nằm ở hai tầng khác nhau: paper semantic-layer quyết định cấu trúc hệ thống, còn DAIL-SQL cải thiện context/example selection bên trong planner. Phần direct text-to-SQL của DAIL-SQL không được dùng làm đường thực thi chính.
 
 ## 1. Đọc repository như một bài toán nghiên cứu
 
@@ -452,12 +463,12 @@ Với mỗi paper, chỉ cần trả lời năm câu hỏi:
 
 ### Vertical slice đầu tiên
 
-Chọn một domain nhỏ, ví dụ supplier delivery:
+Chọn một vertical slice EV analytics nhỏ với Customer360, Vehicle360, battery snapshot, station/charging và service; chỉ charging/service cần time-series trong B0:
 
-- `UC-01`: xếp hạng supplier theo approved metric;
-- `UC-02`: so sánh metric giữa warehouse/region;
+- `UC-01`: xếp hạng trạm, vùng hoặc dòng xe theo approved metric;
+- `UC-02`: so sánh metric giữa trạm/loại trạm/vùng;
 - `UC-03`: trend theo ngày/tuần/tháng;
-- `UC-05`: hỏi lại khi “kém nhất” thiếu metric;
+- `UC-05`: hỏi lại khi “hiệu quả nhất” thiếu metric;
 - `UC-06`: từ chối khi không có quyền hoặc thiếu dữ liệu.
 
 Mỗi use case cần fixture có null, duplicate, cancellation/return, time boundary, timezone, late-arriving data và join fan-out.
@@ -466,12 +477,14 @@ Mỗi use case cần fixture có null, duplicate, cancellation/return, time boun
 
 | Baseline | Mục đích |
 |---|---|
-| B0: direct LLM → SQL + AST validator | Đo mức cơ bản và failure của direct generation |
-| B1: LLM → semantic plan → deterministic SQL | Đo lợi ích của IR/semantic contract |
-| B2: B1 + hybrid retrieval/pruning | Đo schema/metric grounding và token cost |
-| B3: B2 + bounded execution repair | Đo lỗi repairable và nguy cơ repair sai |
-| B4: B3 + clarification/abstention | Đo safe completion, không chỉ coverage |
-| B5: B4 + few-shot retrieval theo plan/AST | Đo quality/cost của examples |
+| E0: direct LLM → SQL + AST validator | Đo mức cơ bản và failure của direct generation |
+| E1: LLM → semantic plan → deterministic SQL | Đo lợi ích của IR/semantic contract |
+| E2: E1 + hybrid retrieval/pruning | Đo schema/metric grounding và token cost |
+| E3: E2 + bounded execution repair | Đo lỗi repairable và nguy cơ repair sai |
+| E4: E3 + clarification/abstention | Đo safe completion, không chỉ coverage |
+| E5: E4 + few-shot retrieval theo plan/AST | Đo quality/cost của examples |
+
+Ký hiệu `E*` là biến thể evaluation/ablation, tách khỏi milestone triển khai `B0–B4` trong tài liệu kiến trúc Wren–Datus.
 
 ### Ablation bắt buộc
 

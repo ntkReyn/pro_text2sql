@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
-const nextConfig: NextConfig = {
+const nextConfig = (phase: string): NextConfig => ({
   agentRules: false,
   output: "standalone",
-  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next-dev" : ".next",
   poweredByHeader: false,
   reactStrictMode: true,
-};
+});
 
 export default nextConfig;

@@ -1,13 +1,13 @@
 # ADR-0012: Package the MVP as a single application container
 
-- Status: Accepted
+- Status: Superseded
 - Date: 2026-09-14
 - Decision makers: Repository owner
 - Technical owner: Project team
 - Consulted: None
 - Informed: Project team
 - Supersedes: None
-- Superseded by: None
+- Superseded by: [ADR-0014](0014-run-local-mvp-with-postgresql.md)
 
 ## Context and problem statement
 
