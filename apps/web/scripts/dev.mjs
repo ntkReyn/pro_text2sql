@@ -1,14 +1,22 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(webRoot, "..", "..");
-const pythonCommand = process.env.PYTHON_COMMAND || "python";
+const envFile = path.join(repositoryRoot, ".env");
+if (existsSync(envFile) && typeof process.loadEnvFile === "function") {
+  process.loadEnvFile(envFile);
+}
+
+const appPython = path.join(repositoryRoot, ".venv-app", "Scripts", "python.exe");
+const pythonCommand = process.env.PYTHON_COMMAND || (existsSync(appPython) ? appPython : "python");
 const apiHost = "127.0.0.1";
 const apiPort = process.env.DEV_API_PORT || "8000";
 const webPort = process.env.DEV_WEB_PORT || "3000";
 const apiBaseUrl = `http://${apiHost}:${apiPort}`;
+const apiReload = process.env.DEV_API_RELOAD === "true";
 const children = new Set();
 let shuttingDown = false;
 
@@ -45,9 +53,9 @@ async function waitForCurrentApi(backend) {
       const response = await fetch(`${apiBaseUrl}/openapi.json`, { cache: "no-store" });
       if (response.ok) {
         const openapi = await response.json();
-        if (openapi.paths?.["/api/v1/query/baseline"]?.post) return;
+        if (openapi.paths?.["/api/v1/query/wren"]?.post) return;
         throw new Error(
-          `Cổng ${apiPort} đang phục vụ API cũ, chưa có /api/v1/query/baseline.`,
+          `Cổng ${apiPort} đang phục vụ API cũ, chưa có /api/v1/query/wren.`,
         );
       }
     } catch (error) {
@@ -61,18 +69,26 @@ async function waitForCurrentApi(backend) {
 process.once("SIGINT", () => shutdown(0));
 process.once("SIGTERM", () => shutdown(0));
 
-console.log(`[dev] Khởi động FastAPI mới tại ${apiBaseUrl}`);
+console.log(`[dev] Khởi động FastAPI Wren-first tại ${apiBaseUrl}`);
 const backend = start(
   pythonCommand,
   [
     "-m", "uvicorn", "apps.api.main:app",
-    "--reload",
-    "--reload-dir", "apps/api",
-    "--reload-dir", "packages",
     "--host", apiHost,
     "--port", apiPort,
+    ...(apiReload
+      ? ["--reload", "--reload-dir", "apps/api", "--reload-dir", "packages"]
+      : []),
   ],
-  { cwd: repositoryRoot, env: { ...process.env, API_HOST: apiHost, API_PORT: apiPort } },
+  {
+    cwd: repositoryRoot,
+    env: {
+      ...process.env,
+      API_HOST: apiHost,
+      API_PORT: apiPort,
+      WREN_PROJECT_PATH: process.env.WREN_PROJECT_PATH || path.join(repositoryRoot, "wren", "ev_analytics"),
+    },
+  },
 );
 
 try {

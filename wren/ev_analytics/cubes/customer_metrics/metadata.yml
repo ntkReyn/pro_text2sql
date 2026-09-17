@@ -1,0 +1,27 @@
+name: customer_metrics
+base_object: customer_analytics_v1
+measures:
+  - name: customer_count
+    expression: COUNT(*)
+    type: BIGINT
+dimensions:
+  - name: customer_segment
+    expression: customer_segment
+    type: VARCHAR
+  - name: customer_type
+    expression: customer_type
+    type: VARCHAR
+  - name: customer_status
+    expression: customer_status
+    type: VARCHAR
+  - name: customer_region_code
+    expression: customer_region_code
+    type: VARCHAR
+time_dimensions:
+  - name: joined_on
+    expression: joined_on
+    type: DATE
+hierarchies:
+  geography: [customer_region_code]
+properties:
+  description: Customer-level counts and current vehicle ownership for segmentation.

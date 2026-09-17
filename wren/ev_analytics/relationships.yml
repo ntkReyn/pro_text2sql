@@ -1,0 +1,3 @@
+# Semantic marts are intentionally independent in this iteration. Add a
+# relationship only after its join cardinality and grain contract are reviewed.
+relationships: []

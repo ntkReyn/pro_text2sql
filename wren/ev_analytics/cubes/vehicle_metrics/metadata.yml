@@ -1,0 +1,27 @@
+name: vehicle_metrics
+base_object: vehicle_analytics_v1
+measures:
+  - name: vehicle_count
+    expression: COUNT(*)
+    type: BIGINT
+dimensions:
+  - name: vehicle_status
+    expression: vehicle_status
+    type: VARCHAR
+  - name: vehicle_model_code
+    expression: vehicle_model_code
+    type: VARCHAR
+  - name: customer_segment
+    expression: customer_segment
+    type: VARCHAR
+  - name: customer_region_code
+    expression: customer_region_code
+    type: VARCHAR
+  - name: model_year
+    expression: model_year
+    type: INTEGER
+hierarchies:
+  vehicle: [vehicle_model_code, model_year]
+  geography: [customer_region_code]
+properties:
+  description: Current vehicle inventory and ownership segmentation.

@@ -1,0 +1,8 @@
+schema_version: 5
+name: atlasiq_ev_analytics
+version: "1.0.0"
+# Project-level namespace is Wren's semantic namespace. Physical database
+# placement is declared per model in table_reference below.
+catalog: wren
+schema: public
+data_source: postgres

@@ -8,7 +8,7 @@
     "dev:api": "python -m uvicorn apps.api.main:app --app-dir ../.. --reload --host 127.0.0.1 --port 8000",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0 --port 3000",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit --incremental false"
   },
   "dependencies": {
     "framer-motion": "^12.43.0",

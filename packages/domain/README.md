@@ -1,3 +1,4 @@
 # Domain
 
-Chứa khái niệm và luật nghiệp vụ độc lập với LLM, database và web framework: query request, conversation, metric reference, analysis result, evidence, policy và trạng thái workflow.
+Chứa các contract độc lập với LLM, database và web framework: SQL security
+report, execution result và trạng thái quyết định policy.

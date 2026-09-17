@@ -22,52 +22,39 @@ type SectionView = Exclude<View, "dashboard" | "query" | "conversations" | "metr
 type AppIcon = typeof LayoutDashboard;
 type NavItem = { id: View; label: string; icon: AppIcon };
 type ConversationItem = { id: string; title: string; preview: string; updated: string; question: string };
-type QueryFilter = { field: string; operator: string; value: string | number | boolean | Array<string | number | boolean> };
-type SemanticPlan = {
-  metric_id: string;
-  metric_version: string;
-  dimensions: string[];
-  filters: QueryFilter[];
-  time_range: { start: string; end_exclusive: string } | null;
-  grain: string[];
-  sort: Array<{ field: string; direction: string }>;
-  limit: number;
+type WrenResponse = {
+  status: "planned" | "executed" | "needs_clarification" | "unanswerable" | "failed";
+  question: string;
+  message: string | null;
+  sql: string | null;
+  planned_sql: string | null;
   assumptions: string[];
-};
-type PlanningTrace = {
-  architecture_version: string;
-  canonical_question: string;
-  gate_decision: "clear" | "clarify" | "abstain";
-  gate_message: string | null;
-  grounded_values: Array<{ field: string; canonical_value: string | number | boolean; matched_alias: string; source_version: string; confidence: number }>;
-  preliminary_intent: {
-    metric_candidates: string[];
-    dimension_candidates: string[];
-    filter_fields: string[];
-    operations: string[];
-    has_time_scope: boolean;
-    requested_limit: number | null;
-    structure_tokens: string[];
-  } | null;
-  retrieved_examples: Array<{ case_id: string; question: string; metric_id: string; score: number }>;
-  plan_validation: string;
-};
-type BaselineResponse = {
-  planning: {
-    status: "planned" | "needs_clarification" | "unanswerable";
-    normalized_question: string;
-    plan: SemanticPlan | null;
-    message: string | null;
-    trace: PlanningTrace | null;
+  context: {
+    project: string;
+    models: Array<{ name: string; description: string | null; columns: string[] }>;
+    knowledge_files: string[];
+    confirmed_query_count: number;
   };
-  candidate: {
-    sql: string;
-    parameters: Record<string, string | number | boolean>;
-    dialect: "postgres";
-    metric_id: string;
-    metric_version: string;
-    plan_version: "1.0";
+  security: {
+    decision: "pass" | "reject";
+    referenced_relations: string[];
+    checks: string[];
+    error_code: string | null;
   } | null;
+  execution: {
+    columns: string[];
+    rows: Array<Record<string, unknown>>;
+    row_count: number;
+    truncated: boolean;
+    duration_ms: number;
+  } | null;
+  trace: {
+    workflow_version: string;
+    context_loaded: boolean;
+    dry_plan_attempts: number;
+    repair_attempts: number;
+    stages: string[];
+  };
 };
 
 const DEMO_ROLE_STORAGE_KEY = "atlasiq_demo_role_v2";
@@ -248,32 +235,24 @@ function ConversationHistory({ items, activeId, onSelect, onNew, onDelete, onDel
   return <aside className={`conversation-history ${variant === "page" ? "conversation-history-page" : ""}`} aria-label="Lịch sử trò chuyện"><div className="conversation-history-heading"><div><span className="conversation-history-kicker">Workspace</span><h2>Trò chuyện</h2></div></div><button className="new-conversation-button" type="button" onClick={onNew}><Plus />Đoạn chat mới</button><div className="conversation-history-section-heading"><h3>Lịch sử trò chuyện</h3><div className="conversation-history-actions"><button className="conversation-history-delete-all" type="button" onClick={onDeleteAll} disabled={items.length === 0} aria-label="Xóa tất cả cuộc trò chuyện" title="Xóa tất cả">Xóa tất cả</button><span className="conversation-count" aria-label={`${items.length} cuộc trò chuyện`}>{items.length}</span></div></div><div className="conversation-history-list">{items.length > 0 ? items.map((item) => <div className={`conversation-history-item ${activeId === item.id ? "active" : ""}`} key={item.id}><button className="conversation-history-item-open" type="button" onClick={() => onSelect(item)} aria-pressed={activeId === item.id}><span className="conversation-history-icon"><MessageSquareText /></span><span className="conversation-history-copy"><strong>{item.title}</strong><small>{item.preview}</small><time>{item.updated}</time></span></button><button className="conversation-history-delete" type="button" onClick={() => onDelete(item.id)} aria-label={`Xóa cuộc trò chuyện ${item.title}`} title="Xóa cuộc trò chuyện"><Trash2 /></button></div>) : <p className="conversation-history-empty">Chưa có cuộc trò chuyện nào.</p>}</div></aside>;
 }
 
-function formatFilters(filters: QueryFilter[]) {
-  if (filters.length === 0) return "Không có";
-  return filters.map((filter) => `${filter.field} ${filter.operator} ${Array.isArray(filter.value) ? filter.value.join(", ") : String(filter.value)}`).join(" · ");
-}
-
-function BaselineResult({ response, error, loading, canViewSql }: { response: BaselineResponse | null; error: string; loading: boolean; canViewSql: boolean }) {
+function WrenResult({ response, error, loading, canViewSql }: { response: WrenResponse | null; error: string; loading: boolean; canViewSql: boolean }) {
   if (loading) {
-    return <section className="query-result-layout loading live-baseline-result" aria-label="Đang lập kế hoạch truy vấn"><article className="panel result-panel-large baseline-state-panel"><LoaderCircle className="spin" /><div><span>Baseline đang xử lý</span><h2>Đang ánh xạ câu hỏi vào semantic catalog…</h2><p>Luồng hiện tại dừng ở semantic plan và PostgreSQL tham số hóa, chưa thực thi dữ liệu.</p></div></article></section>;
+    return <section className="query-result-layout loading live-wren-result" aria-label="Đang lập kế hoạch truy vấn"><article className="panel result-panel-large wren-state-panel"><LoaderCircle className="spin" /><div><span>Wren workflow đang xử lý</span><h2>Đang đọc MDL và viết SQL theo semantic model…</h2><p>Wren sẽ kiểm tra SQL bằng dry-plan trước khi thực thi.</p></div></article></section>;
   }
   if (error) {
-    return <section className="query-result-layout live-baseline-result" aria-label="Lỗi kết nối"><article className="panel result-panel-large baseline-state-panel baseline-error"><TriangleAlert /><div><span>Không thể hoàn tất</span><h2>Analytics API chưa sẵn sàng</h2><p>{error}</p></div></article></section>;
+    return <section className="query-result-layout live-wren-result" aria-label="Lỗi kết nối"><article className="panel result-panel-large wren-state-panel wren-error"><TriangleAlert /><div><span>Không thể hoàn tất</span><h2>Analytics API chưa sẵn sàng</h2><p>{error}</p></div></article></section>;
   }
   if (!response) return null;
 
-  const { planning, candidate } = response;
-  if (planning.status !== "planned" || !planning.plan) {
-    const clarification = planning.status === "needs_clarification";
-    return <section className="query-result-layout live-baseline-result" aria-label="Kết quả answerability"><article className={`panel result-panel-large baseline-state-panel ${clarification ? "baseline-clarification" : "baseline-error"}`}>{clarification ? <CircleHelp /> : <TriangleAlert />}<div><span>{clarification ? "Cần làm rõ" : "Ngoài phạm vi baseline"}</span><h2>{clarification ? "Câu hỏi chưa đủ thông tin" : "Baseline chủ động không trả lời"}</h2><p>{planning.message ?? "Không tìm thấy metric phù hợp trong catalog."}</p><small>Câu chuẩn hóa: {planning.normalized_question}</small></div></article></section>;
+  if (response.status !== "planned" && response.status !== "executed") {
+    const clarification = response.status === "needs_clarification";
+    return <section className="query-result-layout live-wren-result" aria-label="Kết quả Wren"><article className={`panel result-panel-large wren-state-panel ${clarification ? "wren-clarification" : "wren-error"}`}>{clarification ? <CircleHelp /> : <TriangleAlert />}<div><span>{clarification ? "Cần làm rõ" : "Ngoài phạm vi Wren"}</span><h2>{clarification ? "Câu hỏi chưa đủ thông tin" : "Wren chưa thể trả lời"}</h2><p>{response.message ?? "Wren chưa thể lập kế hoạch cho câu hỏi này."}</p><small>Câu hỏi: {response.question}</small></div></article></section>;
   }
 
-  const plan = planning.plan;
-  const timeRange = plan.time_range ? `${plan.time_range.start} → ${plan.time_range.end_exclusive} (exclusive)` : "Snapshot hiện tại";
-  const trace = planning.trace;
-  const grounded = trace?.grounded_values.map((item) => `${item.matched_alias} → ${item.field}=${String(item.canonical_value)}`).join(" · ") || "Không có";
-  const examples = trace?.retrieved_examples.map((item) => `${item.case_id} (${item.score.toFixed(2)})`).join(" · ") || "Chưa truy xuất";
-  return <section className="query-result-layout ready live-baseline-result" aria-label="Semantic plan đã biên dịch"><article className="panel result-panel-large"><div className="result-heading"><div><span>Context pipeline {trace?.architecture_version ?? "B0"} · Không thực thi database</span><h2>{plan.metric_id}</h2></div><span className="verified-label"><CheckCircle2 />Đã biên dịch</span></div><div className="baseline-plan-grid"><div><span>Dimensions</span><strong>{plan.dimensions.join(", ") || "Không có"}</strong></div><div><span>Thời gian</span><strong>{timeRange}</strong></div><div><span>Filters</span><strong>{formatFilters(plan.filters)}</strong></div><div><span>Limit</span><strong>{plan.limit}</strong></div></div><div className="result-insight"><Sparkles /><p><strong>Semantic plan hợp lệ.</strong> Normalizer, value grounding, ambiguity gate và Semantic-DAIL đã tạo context; compiler tất định vẫn giữ vai trò baseline trước Wren.</p></div>{canViewSql && candidate && <details className="baseline-sql"><summary><Code2 />Xem SQL đã biên dịch</summary><pre>{candidate.sql}</pre><h3>Parameters</h3><pre>{JSON.stringify(candidate.parameters, null, 2)}</pre></details>}</article><aside className="panel evidence-panel-large"><div className="evidence-title"><span><Database />Bằng chứng</span><CheckCircle2 /></div><dl><Evidence label="Metric" value={`${plan.metric_id} · ${plan.metric_version}`} /><Evidence label="Preliminary intent" value={trace?.preliminary_intent?.operations.join(", ") || "B0 rule"} /><Evidence label="Value grounding" value={grounded} /><Evidence label="Semantic-DAIL" value={examples} /><Evidence label="Grain" value={plan.grain.join(", ") || "Toàn bộ tập kết quả"} /><Evidence label="Bộ lọc" value={formatFilters(plan.filters)} /><Evidence label="Dialect" value={candidate?.dialect ?? "Chưa biên dịch"} /><Evidence label="Validation" value={trace?.plan_validation ?? "passed"} /><Evidence label="Trạng thái" value="Planned + compiled, chưa execute" /></dl>{!canViewSql && <p className="baseline-role-note"><BookOpen />Role hiện tại xem semantic evidence; SQL chỉ hiển thị cho Analyst và Metric Steward.</p>}</aside></section>;
+  const security = response.security;
+  const trace = response.trace;
+  const modelSummary = response.context.models.map((item) => item.name).join(", ") || "Không có";
+  return <section className="query-result-layout ready live-wren-result" aria-label="Wren SQL đã kiểm tra"><article className="panel result-panel-large"><div className="result-heading"><div><span>Wren Engine · {trace.workflow_version}</span><h2>SQL đã được dry-plan</h2></div><span className="verified-label"><CheckCircle2 />{response.status === "executed" ? "Đã thực thi" : "Đã kiểm tra"}</span></div><div className="wren-plan-grid"><div><span>Models</span><strong>{modelSummary}</strong></div><div><span>Knowledge</span><strong>{response.context.knowledge_files.length} tệp</strong></div><div><span>Repairs</span><strong>{trace.repair_attempts}</strong></div><div><span>Rows</span><strong>{response.execution ? response.execution.row_count : "Chưa thực thi"}</strong></div></div><div className="result-insight"><Sparkles /><p><strong>Wren là semantic authority.</strong> Agent đọc MDL/knowledge, tạo SQL theo model name, sau đó Wren `dry_plan` mở rộng sang SQL vật lý và policy kiểm tra lại trước khi chạy.</p></div>{canViewSql && response.sql && <details className="wren-sql" open><summary><Code2 />Xem SQL theo Wren model</summary><pre>{response.sql}</pre></details>}{canViewSql && response.planned_sql && <details className="wren-sql"><summary><Code2 />Xem SQL Wren đã mở rộng</summary><pre>{response.planned_sql}</pre></details>}</article><aside className="panel evidence-panel-large"><div className="evidence-title"><span><Database />Bằng chứng</span><CheckCircle2 /></div><dl><Evidence label="Project" value={response.context.project} /><Evidence label="Models" value={modelSummary} /><Evidence label="Stages" value={trace.stages.join(" → ")} /><Evidence label="Logical SQL" value={response.sql ? "Đã sinh" : "Không có"} /><Evidence label="Wren dry-plan" value={response.planned_sql ? "Pass" : "Not run"} /><Evidence label="SQL policy" value={security ? `${security.decision}${security.error_code ? ` · ${security.error_code}` : ""}` : "Not run"} /><Evidence label="Trạng thái" value={response.status} /></dl>{!canViewSql && <p className="wren-role-note"><BookOpen />Role hiện tại xem semantic evidence; SQL chỉ hiển thị cho Analyst và Metric Steward.</p>}</aside></section>;
 }
 
 function QueryWorkspace({ role }: { role: Role }) {
@@ -290,7 +269,7 @@ function QueryWorkspace({ role }: { role: Role }) {
   const [stage, setStage] = useState(-1);
   const [complete, setComplete] = useState(true);
   const [showResult, setShowResult] = useState(false);
-  const [baselineResponse, setBaselineResponse] = useState<BaselineResponse | null>(null);
+  const [wrenResponse, setWrenResponse] = useState<WrenResponse | null>(null);
   const [queryError, setQueryError] = useState("");
   const [activeConversation, setActiveConversation] = useState("");
   const [conversationOpen, setConversationOpen] = useState(false);
@@ -303,19 +282,19 @@ function QueryWorkspace({ role }: { role: Role }) {
     setSubmittedQuestion(nextQuestion);
     setShowResult(true);
     setComplete(false);
-    setBaselineResponse(null);
+    setWrenResponse(null);
     setQueryError("");
     setStage(0);
     try {
-      const response = await fetch("/api/baseline", {
+      const response = await fetch("/api/wren", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ question: nextQuestion }),
       });
       setStage(2);
-      const payload = await response.json() as BaselineResponse | { detail?: string };
+      const payload = await response.json() as WrenResponse | { detail?: string };
       if (!response.ok) throw new Error("detail" in payload ? payload.detail : `HTTP ${response.status}`);
-      setBaselineResponse(payload as BaselineResponse);
+      setWrenResponse(payload as WrenResponse);
     } catch (caught) {
       setQueryError(caught instanceof Error ? caught.message : "Không thể kết nối Analytics API.");
     } finally {
@@ -323,12 +302,12 @@ function QueryWorkspace({ role }: { role: Role }) {
       setComplete(true);
     }
   }
-  function openConversation(item: ConversationItem) { setActiveConversation(item.id); setConversationOpen(true); setQuestion(item.question); setSubmittedQuestion(""); setBaselineResponse(null); setQueryError(""); setShowResult(false); setComplete(true); setStage(-1); }
-  function startNewConversation() { setActiveConversation("new"); setConversationOpen(true); setQuestion(""); setSubmittedQuestion(""); setBaselineResponse(null); setQueryError(""); setShowResult(false); setComplete(true); setStage(-1); }
-  function deleteConversation(id: string) { setHistoryItems((items) => items.filter((item) => item.id !== id)); if (activeConversation === id) { setActiveConversation(""); setConversationOpen(false); setQuestion(""); setSubmittedQuestion(""); setBaselineResponse(null); setQueryError(""); setShowResult(false); setStage(-1); } setDeleteTarget(null); }
+  function openConversation(item: ConversationItem) { setActiveConversation(item.id); setConversationOpen(true); setQuestion(item.question); setSubmittedQuestion(""); setWrenResponse(null); setQueryError(""); setShowResult(false); setComplete(true); setStage(-1); }
+  function startNewConversation() { setActiveConversation("new"); setConversationOpen(true); setQuestion(""); setSubmittedQuestion(""); setWrenResponse(null); setQueryError(""); setShowResult(false); setComplete(true); setStage(-1); }
+  function deleteConversation(id: string) { setHistoryItems((items) => items.filter((item) => item.id !== id)); if (activeConversation === id) { setActiveConversation(""); setConversationOpen(false); setQuestion(""); setSubmittedQuestion(""); setWrenResponse(null); setQueryError(""); setShowResult(false); setStage(-1); } setDeleteTarget(null); }
   function requestDeleteConversation(id: string) { const item = historyItems.find((entry) => entry.id === id); if (item) setDeleteTarget(item); }
   function requestDeleteAll() { if (historyItems.length > 0) setDeleteTarget("all"); }
-  function deleteAllConversations() { setHistoryItems([]); setActiveConversation(""); setConversationOpen(false); setQuestion(""); setSubmittedQuestion(""); setBaselineResponse(null); setQueryError(""); setShowResult(false); setStage(-1); setDeleteTarget(null); }
+  function deleteAllConversations() { setHistoryItems([]); setActiveConversation(""); setConversationOpen(false); setQuestion(""); setSubmittedQuestion(""); setWrenResponse(null); setQueryError(""); setShowResult(false); setStage(-1); setDeleteTarget(null); }
   function confirmDelete() { if (deleteTarget === "all") deleteAllConversations(); else if (deleteTarget) deleteConversation(deleteTarget.id); }
   function backToHistory() { setConversationOpen(false); setStage(-1); }
   return <div className="workspace-wrap content-view conversation-view">
@@ -337,7 +316,7 @@ function QueryWorkspace({ role }: { role: Role }) {
       <div className={`conversation-scroll ${showResult ? "has-result" : "new-conversation"}`} aria-live="polite">
         <div className="conversation-message assistant-message"><div className="conversation-body"><div className="conversation-bubble assistant-bubble"><p>{steward ? "Bạn có thể gửi một câu hỏi để kiểm tra định nghĩa, grain và bộ lọc của metric." : "Bạn đang cần quyết định điều gì hôm nay? Hãy bắt đầu bằng một câu hỏi về phiên sạc, trạm sạc, dòng xe, pin hoặc dịch vụ."}</p></div></div></div>
         {showResult && <div className="conversation-message user-message"><div className="conversation-body"><div className="conversation-bubble user-bubble"><p>{submittedQuestion}</p></div><small className="conversation-meta">Câu hỏi đã gửi</small></div></div>}
-        {showResult && <div className="conversation-message assistant-message"><div className="conversation-body conversation-answer"><BaselineResult response={baselineResponse} error={queryError} loading={!complete} canViewSql={canViewSql} /><small className="conversation-meta">AtlasIQ · Baseline B0 semantic plan, chưa thực thi database</small></div></div>}
+        {showResult && <div className="conversation-message assistant-message"><div className="conversation-body conversation-answer"><WrenResult response={wrenResponse} error={queryError} loading={!complete} canViewSql={canViewSql} /><small className="conversation-meta">AtlasIQ · Wren-first workflow, dry-plan trước khi thực thi</small></div></div>}
       </div>
       <form className="conversation-composer" onSubmit={submit}><label className="sr-only" htmlFor="query-input">Câu hỏi phân tích</label><div className="conversation-input-row"><textarea id="query-input" value={question} onChange={(event) => setQuestion(event.target.value)} aria-label="Câu hỏi phân tích" /><button className="conversation-submit-icon" type="submit" disabled={stage >= 0} aria-label={stage >= 0 ? "Đang phân tích" : steward ? "Chạy kiểm thử" : "Phân tích"} title={stage >= 0 ? "Đang phân tích" : steward ? "Chạy kiểm thử" : "Phân tích"}>{stage >= 0 ? <LoaderCircle className="spin" /> : <SendHorizontal />}</button></div><div className={`stage-progress ${stage >= 0 ? "visible" : ""}`} aria-live="polite">{["Hiểu câu hỏi", "Kiểm tra metric", "Tạo truy vấn", "Xác minh kết quả"].map((text, index) => <span key={text} className={stage > index ? "done" : stage === index ? "current" : ""}><Check />{text}</span>)}</div></form>
     </section></div>}

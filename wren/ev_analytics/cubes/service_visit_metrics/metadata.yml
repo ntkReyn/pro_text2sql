@@ -1,0 +1,40 @@
+name: service_visit_metrics
+base_object: service_visit_analytics_v1
+measures:
+  - name: service_visit_count
+    expression: COUNT(*)
+    type: BIGINT
+  - name: completed_service_visit_count
+    expression: COUNT(*) FILTER (WHERE visit_status = 'completed')
+    type: BIGINT
+  - name: repeat_issue_service_visit_count
+    expression: COUNT(*) FILTER (WHERE visit_status = 'completed' AND is_repeat_issue = TRUE)
+    type: BIGINT
+dimensions:
+  - name: visit_status
+    expression: visit_status
+    type: VARCHAR
+  - name: visit_type
+    expression: visit_type
+    type: VARCHAR
+  - name: service_issue_category
+    expression: service_issue_category
+    type: VARCHAR
+  - name: service_center_code
+    expression: service_center_code
+    type: VARCHAR
+  - name: customer_segment
+    expression: customer_segment
+    type: VARCHAR
+  - name: customer_region_code
+    expression: customer_region_code
+    type: VARCHAR
+time_dimensions:
+  - name: opened_at
+    expression: opened_at
+    type: TIMESTAMP
+hierarchies:
+  geography: [customer_region_code]
+  time: [opened_at]
+properties:
+  description: Service visit volume, completion and repeat-issue metrics.

@@ -1,0 +1,52 @@
+name: charging_session_metrics
+base_object: charging_session_analytics_v1
+measures:
+  - name: charging_session_count
+    expression: COUNT(*)
+    type: BIGINT
+  - name: successful_charging_session_count
+    expression: COUNT(*) FILTER (WHERE session_status = 'completed' AND energy_delivered_kwh > 0)
+    type: BIGINT
+  - name: failed_charging_session_count
+    expression: COUNT(*) FILTER (WHERE session_status = 'failed')
+    type: BIGINT
+  - name: charging_success_rate
+    expression: 100.0 * COUNT(*) FILTER (WHERE session_status = 'completed' AND energy_delivered_kwh > 0) / NULLIF(COUNT(*) FILTER (WHERE session_status IN ('completed', 'failed')), 0)
+    type: DOUBLE
+  - name: completed_energy_delivered_kwh
+    expression: SUM(energy_delivered_kwh) FILTER (WHERE session_status = 'completed' AND energy_delivered_kwh > 0)
+    type: DOUBLE
+  - name: average_successful_charging_duration_minutes
+    expression: AVG(duration_minutes) FILTER (WHERE session_status = 'completed' AND energy_delivered_kwh > 0)
+    type: DOUBLE
+dimensions:
+  - name: session_status
+    expression: session_status
+    type: VARCHAR
+  - name: billing_status
+    expression: billing_status
+    type: VARCHAR
+  - name: station_region_code
+    expression: station_region_code
+    type: VARCHAR
+  - name: province_name
+    expression: province_name
+    type: VARCHAR
+  - name: vehicle_model_code
+    expression: vehicle_model_code
+    type: VARCHAR
+  - name: customer_segment
+    expression: customer_segment
+    type: VARCHAR
+  - name: primary_connector_type
+    expression: primary_connector_type
+    type: VARCHAR
+time_dimensions:
+  - name: started_at
+    expression: started_at
+    type: TIMESTAMP
+hierarchies:
+  geography: [province_name, station_region_code]
+  time: [started_at]
+properties:
+  description: Governed charging-attempt metrics with success, energy and duration semantics.

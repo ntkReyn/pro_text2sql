@@ -1,0 +1,91 @@
+name: charging_station_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: charging_station_analytics_v1
+primary_key: charging_station_id
+columns:
+  - name: charging_station_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Stable synthetic identifier for one physical charging site.
+  - name: station_name
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Human-readable synthetic charging-station name.
+  - name: operator_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic operator code responsible for the charging site.
+  - name: station_scope
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Station usage scope; expected values are public, dealer, workplace, or home.
+  - name: station_region_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Coarse synthetic region code for the charging site.
+  - name: province_name
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic province label for geographic grouping.
+  - name: connector_type
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Primary connector type at the site; expected values are AC_TYPE2 or DC_CCS2.
+  - name: maximum_power_kw
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Maximum charging power capacity measured in kilowatts (kW).
+  - name: charging_port_count
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Number of charging ports at the site; this model's grain is one station, not one port.
+  - name: station_operational_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Current station lifecycle status; expected values are operational, maintenance, or inactive.
+  - name: commissioned_on
+    type: DATE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Date on which the synthetic station was commissioned.
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Source-system update timestamp for the station dimension row.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the station semantic mart row was built; it is processing metadata.
+properties:
+  description: >-
+    Grain: one synthetic charging station, not one charging port. Use
+    charging_port_count when measuring site capacity and station_operational_status
+    when measuring operational availability.

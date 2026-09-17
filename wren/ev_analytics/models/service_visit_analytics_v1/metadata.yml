@@ -1,0 +1,132 @@
+name: service_visit_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: service_visit_analytics_v1
+primary_key: service_visit_id
+columns:
+  - name: service_visit_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Stable synthetic identifier for one service-center visit.
+  - name: opened_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Service-visit opening event timestamp and default business time for service analysis.
+  - name: completed_at
+    type: TIMESTAMP
+    is_calculated: false
+    properties:
+      description: Service-visit completion timestamp; it may be NULL until the visit is completed.
+  - name: visit_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Service-visit lifecycle status; expected values are scheduled, in_progress, completed, or cancelled.
+  - name: visit_type
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Service-visit category; expected values are maintenance, repair, recall, or inspection.
+  - name: service_issue_category
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic category of the service issue or requested work.
+  - name: service_center_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic identifier of the service center handling the visit.
+  - name: odometer_km
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle odometer reading in kilometres at the service visit.
+  - name: warranty_covered
+    type: BOOLEAN
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Whether the service visit is covered by warranty according to the synthetic source flag.
+  - name: is_repeat_issue
+    type: BOOLEAN
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Whether the visit addresses a repeat issue; use it with visit_status = completed for the governed repeat-issue metric.
+  - name: customer_paid_amount
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Amount paid by the customer in the currency identified by currency_code; it may be NULL when no customer payment applies.
+  - name: currency_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: ISO-like synthetic three-character currency code paired with customer_paid_amount.
+  - name: satisfaction_score
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Customer satisfaction score on the synthetic 1-to-5 scale; it may be NULL when not collected.
+  - name: vehicle_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic vehicle key serviced during the visit.
+  - name: vehicle_model_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic vehicle model code associated with the visit.
+  - name: model_year
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle model year associated with the visit.
+  - name: customer_id
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current customer association for the vehicle; it may be NULL and does not represent historical ownership.
+  - name: customer_segment
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's analytics segment; it may be NULL.
+  - name: customer_region_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's coarse region code; it may be NULL.
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Greatest source update timestamp across the visit, vehicle, and available customer records.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the service-visit semantic mart row was built; it is processing metadata.
+properties:
+  description: >-
+    Grain: one service-center visit enriched with current vehicle and current
+    customer attributes. Completed-visit metrics must require visit_status =
+    completed; customer attributes describe current association only.

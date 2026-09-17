@@ -1,0 +1,33 @@
+name: charging_station_metrics
+base_object: charging_station_analytics_v1
+measures:
+  - name: charging_station_count
+    expression: COUNT(*)
+    type: BIGINT
+  - name: operational_charging_station_count
+    expression: COUNT(*) FILTER (WHERE station_operational_status = 'operational')
+    type: BIGINT
+dimensions:
+  - name: station_scope
+    expression: station_scope
+    type: VARCHAR
+  - name: station_region_code
+    expression: station_region_code
+    type: VARCHAR
+  - name: province_name
+    expression: province_name
+    type: VARCHAR
+  - name: connector_type
+    expression: connector_type
+    type: VARCHAR
+  - name: station_operational_status
+    expression: station_operational_status
+    type: VARCHAR
+time_dimensions:
+  - name: commissioned_on
+    expression: commissioned_on
+    type: DATE
+hierarchies:
+  geography: [province_name, station_region_code]
+properties:
+  description: Charging-station inventory and operational availability by geography.

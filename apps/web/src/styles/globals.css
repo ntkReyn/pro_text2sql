@@ -1443,7 +1443,7 @@ input:focus-visible {
 .secondary-button:hover { color: var(--brand-indigo); border-color: rgba(88, 87, 230, 0.3); }
 .secondary-button svg { width: 17px; }
 
-.live-baseline-result .baseline-state-panel {
+.live-wren-result .wren-state-panel {
   grid-column: 1 / -1;
   min-height: 180px;
   display: flex;
@@ -1451,14 +1451,14 @@ input:focus-visible {
   gap: 16px;
 }
 
-.baseline-state-panel > svg {
+.wren-state-panel > svg {
   width: 28px;
   height: 28px;
   flex: none;
   color: var(--brand-indigo);
 }
 
-.baseline-state-panel > div > span {
+.wren-state-panel > div > span {
   color: var(--brand-indigo);
   font-size: 0.74rem;
   font-weight: 750;
@@ -1466,22 +1466,22 @@ input:focus-visible {
   text-transform: uppercase;
 }
 
-.baseline-state-panel h2 { margin: 7px 0 8px; font-size: 1.25rem; }
-.baseline-state-panel p { margin: 0; color: var(--text-soft); line-height: 1.55; }
-.baseline-state-panel small { display: block; margin-top: 13px; color: var(--text-faint); }
-.baseline-state-panel.baseline-error > svg { color: var(--danger); }
-.baseline-state-panel.baseline-error > div > span { color: var(--danger); }
-.baseline-state-panel.baseline-clarification > svg { color: var(--warning); }
-.baseline-state-panel.baseline-clarification > div > span { color: var(--warning); }
+.wren-state-panel h2 { margin: 7px 0 8px; font-size: 1.25rem; }
+.wren-state-panel p { margin: 0; color: var(--text-soft); line-height: 1.55; }
+.wren-state-panel small { display: block; margin-top: 13px; color: var(--text-faint); }
+.wren-state-panel.wren-error > svg { color: var(--danger); }
+.wren-state-panel.wren-error > div > span { color: var(--danger); }
+.wren-state-panel.wren-clarification > svg { color: var(--warning); }
+.wren-state-panel.wren-clarification > div > span { color: var(--warning); }
 
-.baseline-plan-grid {
+.wren-plan-grid {
   margin: 23px 0 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
 
-.baseline-plan-grid > div {
+.wren-plan-grid > div {
   min-height: 76px;
   padding: 13px 14px;
   border: 1px solid var(--border);
@@ -1489,13 +1489,13 @@ input:focus-visible {
   background: var(--surface-subtle);
 }
 
-.baseline-plan-grid span {
+.wren-plan-grid span {
   display: block;
   color: var(--text-faint);
   font-size: 0.69rem;
 }
 
-.baseline-plan-grid strong {
+.wren-plan-grid strong {
   display: block;
   margin-top: 6px;
   overflow-wrap: anywhere;
@@ -1503,7 +1503,7 @@ input:focus-visible {
   line-height: 1.45;
 }
 
-.baseline-sql {
+.wren-sql {
   margin-top: 17px;
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -1511,7 +1511,7 @@ input:focus-visible {
   background: #0d1b2f;
 }
 
-.baseline-sql summary {
+.wren-sql summary {
   padding: 13px 15px;
   display: flex;
   align-items: center;
@@ -1522,11 +1522,11 @@ input:focus-visible {
   font-weight: 700;
 }
 
-.baseline-sql summary svg { width: 16px; }
-.baseline-sql pre { margin: 0; padding: 15px; overflow: auto; color: #b9f3e9; border-top: 1px solid rgba(255, 255, 255, 0.1); font: 0.72rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
-.baseline-sql h3 { margin: 0; padding: 11px 15px; color: #91a4c3; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.69rem; text-transform: uppercase; }
-.baseline-role-note { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--text-soft); font-size: 0.75rem; line-height: 1.5; }
-.baseline-role-note svg { width: 17px; flex: none; color: var(--brand-indigo); }
+.wren-sql summary svg { width: 16px; }
+.wren-sql pre { margin: 0; padding: 15px; overflow: auto; color: #b9f3e9; border-top: 1px solid rgba(255, 255, 255, 0.1); font: 0.72rem/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
+.wren-sql h3 { margin: 0; padding: 11px 15px; color: #91a4c3; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.69rem; text-transform: uppercase; }
+.wren-role-note { margin: 0; display: flex; align-items: flex-start; gap: 8px; color: var(--text-soft); font-size: 0.75rem; line-height: 1.5; }
+.wren-role-note svg { width: 17px; flex: none; color: var(--brand-indigo); }
 
 .sr-only {
   position: absolute;

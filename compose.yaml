@@ -74,18 +74,8 @@ services:
       ANALYTICS_DATABASE_DIALECT: postgresql
       ANALYTICS_DATABASE_POOL_MODE: direct
       ANALYTICS_DATABASE_SSL_MODE: disable
-      EMBEDDING_DEVICE: cpu
-      RERANKER_DEVICE: cpu
-      EMBEDDING_LOCAL_FILES_ONLY: "true"
-      HF_HOME: /opt/huggingface
-      HF_HUB_OFFLINE: "true"
     ports:
       - "${API_PORT:-8000}:8000"
-    volumes:
-      - type: bind
-        source: ${HF_CACHE_HOST_PATH:?Set HF_CACHE_HOST_PATH in .env}
-        target: /opt/huggingface
-        read_only: true
     init: true
     restart: unless-stopped
     read_only: true

@@ -1,0 +1,78 @@
+name: customer_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: customer_analytics_v1
+primary_key: customer_id
+columns:
+  - name: customer_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Stable synthetic customer key; it is never a real customer identifier.
+  - name: customer_type
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Customer account type; expected values are individual, corporate, or fleet.
+  - name: customer_segment
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Analytics segment; expected values are standard, premium, or fleet.
+  - name: age_band
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Coarse age band for analytics; it may be NULL when the source does not provide one.
+  - name: customer_region_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Coarse home-region code; this is an analytics geography, not a precise location.
+  - name: joined_on
+    type: DATE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Customer join date and the business date for customer cohort analysis.
+  - name: customer_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Current customer lifecycle status; expected values are active or inactive.
+  - name: analytics_consent
+    type: BOOLEAN
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic analytics-consent flag for governance tests; it is not a legal consent record.
+  - name: vehicle_count
+    type: BIGINT
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Count of vehicles currently associated with the customer; customers without a vehicle remain included with zero.
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Latest source-system update timestamp carried into this mart; use it for lineage, not business event time.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the semantic mart row was built; it is processing metadata, not customer activity time.
+properties:
+  description: >-
+    Grain: one current synthetic customer, including customers without a current
+    vehicle. This is the canonical customer mart for customer counts and
+    customer-segment analysis. It contains no direct personal identifiers.

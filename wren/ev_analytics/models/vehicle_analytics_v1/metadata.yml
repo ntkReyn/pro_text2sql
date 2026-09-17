@@ -1,0 +1,74 @@
+name: vehicle_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: vehicle_analytics_v1
+primary_key: vehicle_id
+columns:
+  - name: vehicle_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Stable synthetic vehicle key; it is never a real VIN.
+  - name: vehicle_model_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic vehicle model code used for model-year and fleet segmentation.
+  - name: model_year
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle model year, not the year of the latest measurement.
+  - name: vehicle_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Current vehicle lifecycle status; expected values are inventory, active, in_service, or inactive.
+  - name: customer_id
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current customer association only; it may be NULL for vehicles without a current owner and must not be used as historical ownership.
+  - name: customer_segment
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's analytics segment; it is NULL when no current customer is associated.
+  - name: customer_region_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's coarse region code; it is NULL when no current customer is associated.
+  - name: customer_status
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's lifecycle status; it is NULL when no current customer is associated.
+  - name: state_of_health_pct
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Latest available battery state of health as a percentage from 0 to 100; descriptive only, not a failure prediction.
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Latest source update timestamp for the vehicle mart row; use it for lineage, not event-time analysis.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the semantic mart row was built; it is processing metadata.
+properties:
+  description: >-
+    Grain: one current synthetic vehicle with normalized current-customer
+    attributes and the latest available battery-health value. Customer fields
+    describe current association only; they do not represent historical owners.

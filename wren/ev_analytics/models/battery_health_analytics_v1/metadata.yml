@@ -1,0 +1,117 @@
+name: battery_health_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: battery_health_analytics_v1
+primary_key: vehicle_id
+columns:
+  - name: battery_snapshot_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Stable synthetic identifier for the source battery-health observation.
+  - name: battery_pack_key
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic battery-pack identifier used to represent replacement history without a real serial number.
+  - name: observed_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Battery observation event timestamp; the model keeps the latest observation per vehicle.
+  - name: state_of_charge_pct
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Battery state of charge as a percentage from 0 to 100 at observation time.
+  - name: state_of_health_pct
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Battery state of health as a percentage from 0 to 100; descriptive only, not a failure prediction.
+  - name: usable_capacity_kwh
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Usable battery capacity measured in kilowatt-hours (kWh).
+  - name: cycle_count
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Non-negative equivalent full-cycle count for the battery pack.
+  - name: pack_temperature_c
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Battery-pack temperature measured in degrees Celsius; it may be NULL when unavailable.
+  - name: odometer_km
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle odometer reading in kilometres at the battery observation time.
+  - name: vehicle_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Current synthetic vehicle key; unique at this model's latest-snapshot-per-vehicle grain.
+  - name: vehicle_model_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic vehicle model code associated with the latest battery snapshot.
+  - name: model_year
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle model year associated with the latest battery snapshot.
+  - name: vehicle_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Current vehicle lifecycle status; expected values are inventory, active, in_service, or inactive.
+  - name: customer_id
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current customer association only; it may be NULL and must not be interpreted as historical ownership.
+  - name: customer_segment
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's analytics segment; it may be NULL when no current customer exists.
+  - name: customer_region_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's coarse region code; it may be NULL when no current customer exists.
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Greatest source update timestamp across the battery, vehicle, and available customer records.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the latest-snapshot semantic mart row was built; it is processing metadata.
+properties:
+  description: >-
+    Grain: latest available battery-health snapshot per vehicle. The source
+    view selects the greatest observed_at per vehicle; health fields are
+    descriptive and must not be presented as failure prediction.

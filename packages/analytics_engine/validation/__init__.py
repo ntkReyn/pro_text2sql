@@ -1,8 +1,7 @@
-"""Deterministic validation for untrusted model outputs."""
+"""Validation at the Wren proposal and execution boundary."""
 
-from packages.analytics_engine.validation.semantic_plan import (
-    SemanticPlanValidationError,
-    SemanticPlanValidator,
+from packages.analytics_engine.validation.sql_security import (
+    WrenSQLSecurityValidator,
 )
 
-__all__ = ["SemanticPlanValidationError", "SemanticPlanValidator"]
+__all__ = ["WrenSQLSecurityValidator"]

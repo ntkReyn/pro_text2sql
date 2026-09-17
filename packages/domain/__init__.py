@@ -1,35 +1,13 @@
-"""Framework-independent domain contracts."""
+"""Framework-independent contracts for the Wren-first runtime."""
 
-from packages.domain.architecture_contracts import (
-    GateDecision,
-    GroundedValue,
-    NormalizedQuestion,
-    PlanningTrace,
-    PreliminaryIntentSketch,
-    RetrievedExample,
-)
-from packages.domain.query_contracts import (
-    FilterOperator,
-    QueryFilter,
-    SemanticQueryPlan,
-    SortDirection,
-    SortSpec,
-    SQLCandidate,
-    TimeRange,
+from packages.domain.execution_contracts import (
+    QueryExecutionResult,
+    SQLSecurityReport,
+    ValidationDecision,
 )
 
 __all__ = [
-    "FilterOperator",
-    "GateDecision",
-    "GroundedValue",
-    "NormalizedQuestion",
-    "PlanningTrace",
-    "PreliminaryIntentSketch",
-    "QueryFilter",
-    "RetrievedExample",
-    "SemanticQueryPlan",
-    "SortDirection",
-    "SortSpec",
-    "SQLCandidate",
-    "TimeRange",
+    "QueryExecutionResult",
+    "SQLSecurityReport",
+    "ValidationDecision",
 ]

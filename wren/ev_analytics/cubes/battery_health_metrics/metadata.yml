@@ -1,0 +1,33 @@
+name: battery_health_metrics
+base_object: battery_health_analytics_v1
+measures:
+  - name: average_latest_battery_soh_pct
+    expression: AVG(state_of_health_pct)
+    type: DOUBLE
+  - name: battery_watch_vehicle_count
+    expression: COUNT(*) FILTER (WHERE state_of_health_pct < 80)
+    type: BIGINT
+  - name: battery_snapshot_count
+    expression: COUNT(*)
+    type: BIGINT
+dimensions:
+  - name: vehicle_model_code
+    expression: vehicle_model_code
+    type: VARCHAR
+  - name: vehicle_status
+    expression: vehicle_status
+    type: VARCHAR
+  - name: customer_segment
+    expression: customer_segment
+    type: VARCHAR
+  - name: customer_region_code
+    expression: customer_region_code
+    type: VARCHAR
+time_dimensions:
+  - name: observed_at
+    expression: observed_at
+    type: TIMESTAMP
+hierarchies:
+  geography: [customer_region_code]
+properties:
+  description: Latest descriptive battery state-of-health snapshots by vehicle.

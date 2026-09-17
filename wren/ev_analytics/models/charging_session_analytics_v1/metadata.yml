@@ -1,0 +1,172 @@
+name: charging_session_analytics_v1
+table_reference:
+  catalog: ""
+  schema: analytics
+  table: charging_session_analytics_v1
+primary_key: charging_session_id
+columns:
+  - name: charging_session_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    is_primary_key: true
+    properties:
+      description: Stable synthetic identifier for one charging attempt.
+  - name: started_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Charging-attempt start event timestamp; use this as the default business time for session analysis.
+  - name: ended_at
+    type: TIMESTAMP
+    is_calculated: false
+    properties:
+      description: Charging-attempt end timestamp; NULL is possible for an in-progress or incomplete attempt.
+  - name: duration_minutes
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Elapsed charging duration in minutes, derived from ended_at minus started_at; NULL when ended_at is NULL.
+  - name: session_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Charging-attempt status; expected values are completed, failed, cancelled, or in_progress.
+  - name: start_soc_pct
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Battery state of charge at session start as a percentage from 0 to 100.
+  - name: end_soc_pct
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Battery state of charge at session end as a percentage from 0 to 100; it may be NULL for incomplete attempts.
+  - name: energy_delivered_kwh
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Energy delivered during the attempt in kilowatt-hours (kWh); zero is valid for failed or non-delivering attempts.
+  - name: peak_power_kw
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Highest observed charging power in kilowatts (kW); it may be NULL when unavailable.
+  - name: billing_status
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Billing classification; expected values are billed, free, unknown, or not_applicable.
+  - name: cost_amount
+    type: DOUBLE
+    is_calculated: false
+    properties:
+      description: Session charge amount in the currency identified by currency_code; it may be NULL when not billed.
+  - name: currency_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: ISO-like synthetic three-character currency code paired with cost_amount; it is NULL when cost_amount is NULL.
+  - name: stop_reason
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Recorded reason why the charging attempt stopped; it may be NULL when not supplied.
+  - name: vehicle_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Current synthetic vehicle key associated with the attempt.
+  - name: vehicle_model_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic vehicle model code associated with the attempt.
+  - name: model_year
+    type: INTEGER
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Vehicle model year associated with the attempt.
+  - name: customer_id
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current customer association for the vehicle; it may be NULL and does not represent historical ownership.
+  - name: customer_segment
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's analytics segment; it may be NULL.
+  - name: customer_region_code
+    type: VARCHAR
+    is_calculated: false
+    properties:
+      description: Current associated customer's coarse region code; it may be NULL.
+  - name: charging_station_id
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic identifier of the charging station where the attempt occurred.
+  - name: station_name
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Human-readable synthetic charging-station name.
+  - name: station_scope
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Station usage scope; expected values are public, dealer, workplace, or home.
+  - name: station_region_code
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Coarse synthetic region code for the charging station.
+  - name: province_name
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Synthetic province label for the charging station.
+  - name: primary_connector_type
+    type: VARCHAR
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Primary station connector type; expected values are AC_TYPE2 or DC_CCS2.
+  - name: maximum_power_kw
+    type: DOUBLE
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Station maximum charging power in kilowatts (kW).
+  - name: source_updated_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Greatest source update timestamp across the session, vehicle, station, and available customer records.
+  - name: model_built_at
+    type: TIMESTAMP
+    is_calculated: false
+    not_null: true
+    properties:
+      description: Timestamp when the charging-session semantic mart row was built; it is processing metadata.
+properties:
+  description: >-
+    Grain: one charging attempt enriched with current vehicle, customer, and
+    station attributes. Use started_at for event-time analysis. Completed
+    charging metrics must require session_status = completed and positive
+    energy_delivered_kwh; failed and cancelled attempts remain in the model.
