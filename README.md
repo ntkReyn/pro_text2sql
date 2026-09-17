@@ -29,6 +29,40 @@ packages/domain/                  execution/security contracts
 wren/ev_analytics/                MDL + Cubes + knowledge source of truth
 ```
 
+## Mô hình dữ liệu EV enterprise
+
+Database local dùng đúng sáu bảng nghiệp vụ, giữ grain rõ ràng và không lưu
+PII trực tiếp:
+
+| Bảng | Grain | Quan hệ chính | Dữ liệu enterprise tiêu biểu |
+|---|---|---|---|
+| `analytics.dim_customer` | một dòng hiện tại / khách hàng | 1 customer → N vehicle | phân khúc, consent, acquisition, audit time |
+| `analytics.dim_vehicle` | một dòng hiện tại / xe | N vehicle → 1 customer; inventory có thể chưa có owner | model, pin, warranty, software, connectivity |
+| `analytics.fact_battery_health_snapshot` | một quan sát / xe / thời điểm | N snapshot → 1 vehicle; có lịch sử pin | SOC/SOH, cycle, capacity, nhiệt độ, data quality |
+| `analytics.dim_charging_station` | một địa điểm sạc | 1 station → N session | operator, vùng, connector, công suất, heartbeat |
+| `analytics.fact_charging_session` | một lần thử sạc | N session → 1 vehicle và 1 station | trạng thái, billing, meter, payment reference giả lập |
+| `analytics.fact_service_visit` | một work order/visit | N visit → 1 vehicle | warranty, priority, root cause, resolution, parts cost |
+
+Migration [`db/migrations/0005_ev_enterprise_governance_columns.sql`](db/migrations/0005_ev_enterprise_governance_columns.sql)
+bổ sung khóa tích hợp synthetic, audit timestamps, trạng thái vận hành và
+data-quality fields. Seed
+[`data/seeds/0001_ev_enterprise_dataset.sql`](data/seeds/0001_ev_enterprise_dataset.sql)
+tạo 124 dòng `ENT` có thể chạy cùng fixture `LAB`, gồm các edge case cần cho
+Text-to-SQL: khách hàng không có xe, khách hàng sở hữu nhiều xe, xe inventory,
+lịch sử battery nhiều snapshot, charging failed/cancelled/in-progress và
+service scheduled/in-progress/completed/cancelled.
+
+Seed mở rộng
+[`data/seeds/0002_ev_enterprise_scale_dataset.sql`](data/seeds/0002_ev_enterprise_scale_dataset.sql)
+bổ sung 100 customer, 125 vehicle, 275 battery snapshot, 100 station, 300
+charging session và 160 service visit. Vì fact là lịch sử/sự kiện nên số dòng
+fact lớn hơn dimension là có chủ đích, không phải bản ghi lặp. Chạy đủ seed sẽ
+có tổng cộng 124 customer, 154 vehicle, 321 battery snapshot, 112 station,
+347 charging session và 190 service visit.
+
+Sau khi migration chạy, có thể audit quan hệ và số dòng bằng
+[`db/quality/ev_enterprise_quality_checks.sql`](db/quality/ev_enterprise_quality_checks.sql).
+
 ## Chạy local
 
 1. Sao chép `.env.example` thành `.env` và điền `LLM_API_KEY`.
@@ -37,6 +71,20 @@ wren/ev_analytics/                MDL + Cubes + knowledge source of truth
 
    ```powershell
    docker compose up --build -d
+   ```
+
+   `migrate` sẽ chạy toàn bộ migration và seed theo thứ tự. Nếu database đã
+   healthy và chỉ muốn chạy migration/seed:
+
+   ```powershell
+   docker compose run --rm migrate
+   ```
+
+   Audit dataset bằng read-only role:
+
+   ```powershell
+   Get-Content db/quality/ev_enterprise_quality_checks.sql |
+     docker compose exec -T db psql -U analytics_readonly -d pro_text2sql
    ```
 
 4. Khởi động API và UI:
